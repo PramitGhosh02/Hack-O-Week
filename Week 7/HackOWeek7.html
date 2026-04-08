@@ -1,0 +1,307 @@
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  #root{font-family:var(--font-sans);display:flex;flex-direction:column;height:640px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+  #hdr{padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);display:flex;align-items:center;gap:10px}
+  .hico{width:32px;height:32px;background:#185FA5;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  #hdr h2{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+  #hdr p{font-size:11.5px;color:var(--color-text-secondary)}
+  #ctx-bar{padding:8px 16px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:36px}
+  #ctx-label{font-size:11px;color:var(--color-text-tertiary);font-weight:500;white-space:nowrap}
+  #ctx-pills{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+  .cpill{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+  .cpill.sem{background:#FAEEDA;color:#633806}
+  .cpill.course{background:#EAF3DE;color:#27500A}
+  .cpill.date{background:#E6F1FB;color:#0C447C}
+  .cpill.intent{background:#EEEDFE;color:#3C3489}
+  .cdot{width:5px;height:5px;border-radius:50%}
+  .cpill.sem .cdot{background:#854F0B}
+  .cpill.course .cdot{background:#3B6D11}
+  .cpill.date .cdot{background:#185FA5}
+  .cpill.intent .cdot{background:#534AB7}
+  #reset-btn{margin-left:auto;font-size:11px;padding:3px 9px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer}
+  #reset-btn:hover{color:var(--color-text-primary);border-color:var(--color-border-primary)}
+  #msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;gap:8px;align-items:flex-start}
+  .row.user{flex-direction:row-reverse}
+  .av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+  .av.bot{background:#185FA5;color:#E6F1FB}
+  .av.user{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+  .bub{max-width:80%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.6;color:var(--color-text-primary)}
+  .bub.bot{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-top-left-radius:4px}
+  .bub.user{background:#185FA5;color:#E6F1FB;border-top-right-radius:4px}
+  .resolve-note{margin-top:7px;padding:6px 10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-left:2px solid #378ADD;border-radius:0 6px 6px 0;font-size:11.5px;color:var(--color-text-secondary)}
+  .resolve-note b{color:var(--color-text-primary);font-weight:500}
+  .epills{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+  .typing-bub{display:flex;gap:4px;align-items:center;padding:10px 13px}
+  .dot{width:6px;height:6px;background:var(--color-text-secondary);border-radius:50%;animation:bop 1.2s infinite;opacity:.4}
+  .dot:nth-child(2){animation-delay:.2s}
+  .dot:nth-child(3){animation-delay:.4s}
+  @keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+  #footer{padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+  #irow{display:flex;gap:8px;align-items:center}
+  #inp{flex:1;padding:8px 14px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:13px;outline:none}
+  #inp:focus{border-color:#378ADD;box-shadow:0 0 0 2px rgba(55,138,221,.12)}
+  #sbtn{width:34px;height:34px;border-radius:50%;border:none;background:#185FA5;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+  #sbtn:hover{background:#0C447C}
+  #sbtn:disabled{background:var(--color-border-tertiary);cursor:default}
+  .sugs{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+  .sg{font-size:11.5px;padding:3px 10px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+  .sg:hover{border-color:#378ADD;color:var(--color-text-primary)}
+  .turn-badge{font-size:10px;padding:1px 6px;border-radius:99px;background:var(--color-background-tertiary);color:var(--color-text-tertiary);border:0.5px solid var(--color-border-tertiary);margin-left:auto;white-space:nowrap}
+</style>
+
+<div id="root">
+  <div id="hdr">
+    <div class="hico">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div>
+      <h2>Academic Entity Bot — Context-Aware</h2>
+      <p>Maintains conversation state across follow-up questions</p>
+    </div>
+  </div>
+
+  <div id="ctx-bar">
+    <span id="ctx-label">Context:</span>
+    <div id="ctx-pills"><span style="font-size:11px;color:var(--color-text-tertiary);font-style:italic">No context yet</span></div>
+    <button id="reset-btn" onclick="resetConvo()">Clear</button>
+  </div>
+
+  <div id="msgs"></div>
+
+  <div id="footer">
+    <div id="irow">
+      <input id="inp" type="text" placeholder='Try "When is the exam?" then "For third year?"' autocomplete="off"/>
+      <button id="sbtn" onclick="send()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+      </button>
+    </div>
+    <div class="sugs" id="sugs">
+      <button class="sg" onclick="fs('When is the exam?')">When is the exam?</button>
+      <button class="sg" onclick="fs('For third year?')">For third year?</button>
+      <button class="sg" onclick="fs('What about CS specifically?')">What about CS?</button>
+      <button class="sg" onclick="fs('Is it on 20 April?')">Is it on 20 April?</button>
+      <button class="sg" onclick="fs('Show me the SEM 6 DBMS schedule')">SEM 6 DBMS schedule</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTHS=["january","february","march","april","may","june","july","august","september","october","november","december"];
+const MSHORT=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+
+let convoState={semesters:[],courses:[],dates:[],intent:null,turnCount:0};
+let apiHistory=[];
+
+function extractEntities(text){
+  const e={semesters:[],courses:[],dates:[]};
+  let m;
+  const s1=/\bsem(?:ester)?\s*[-:]?\s*(\d+)\b/gi;
+  while((m=s1.exec(text))!==null){const v="SEM "+m[1];if(!e.semesters.includes(v))e.semesters.push(v);}
+  const s2=/\b(\d+)(?:st|nd|rd|th)\s+(?:year|sem(?:ester)?)\b/gi;
+  while((m=s2.exec(text))!==null){
+    const n=parseInt(m[1]);
+    let sem=n;
+    if(/year/i.test(m[0]))sem=(n-1)*2+1;
+    const v="SEM "+sem;if(!e.semesters.includes(v))e.semesters.push(v);
+  }
+  const yearWords={first:1,second:2,third:3,fourth:4,fifth:5,sixth:6,seventh:7,eighth:8};
+  Object.entries(yearWords).forEach(([w,n])=>{
+    const re=new RegExp("\\b"+w+"\\s+(?:year|sem(?:ester)?)\\b","gi");
+    if(re.test(text)){const sem=(n-1)*2+1;const v="SEM "+sem;if(!e.semesters.includes(v))e.semesters.push(v);}
+  });
+  const cRe=/\b([A-Z]{2,6})\s*(\d{3,4}[A-Z]?)\b/g;
+  while((m=cRe.exec(text))!==null){const c=m[1]+m[2];if(!e.courses.includes(c)&&!["SEM","THE","AND","FOR"].includes(m[1]))e.courses.push(c);}
+  const subjMap={cs:"Computer Science",cse:"CS & Engineering",ece:"Electronics",eee:"Electrical",me:"Mechanical",ce:"Civil",math:"Mathematics",maths:"Mathematics",phy:"Physics",chem:"Chemistry",ds:"Data Structures",os:"Operating Systems",dbms:"Database Management",cn:"Computer Networks",ai:"Artificial Intelligence",ml:"Machine Learning"};
+  Object.entries(subjMap).forEach(([k,v])=>{
+    if(new RegExp("\\b"+k+"\\b","i").test(text)&&!e.courses.find(c=>c.toLowerCase()===v.toLowerCase()))e.courses.push(v);
+  });
+  const dp=[
+    {re:/\b(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s*(\d{4})?\b/gi,fn:m=>`${m[1]} ${m[2][0].toUpperCase()+m[2].slice(1)}${m[3]?" "+m[3]:""}`},
+    {re:/\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2}),?\s*(\d{4})?\b/gi,fn:m=>`${m[1][0].toUpperCase()+m[1].slice(1)} ${m[2]}${m[3]?", "+m[3]:""}`},
+    {re:/\b(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/gi,fn:m=>{const full=MONTHS[MSHORT.indexOf(m[2].toLowerCase())];return `${m[1]} ${full[0].toUpperCase()+full.slice(1)}`;}}
+  ];
+  dp.forEach(({re,fn})=>{while((m=re.exec(text))!==null){const d=fn(m);if(!e.dates.includes(d))e.dates.push(d);}});
+  ["today","tomorrow","this week","next week","this month"].forEach(r=>{if(new RegExp("\\b"+r+"\\b","i").test(text)&&!e.dates.includes(r))e.dates.push(r);});
+  return e;
+}
+
+function detectIntent(text){
+  const t=text.toLowerCase();
+  if(/exam|test|paper|assessment/i.test(t))return"exam";
+  if(/syllabus|topics?|chapters?|curriculum/i.test(t))return"syllabus";
+  if(/result|mark|grade|score/i.test(t))return"result";
+  if(/schedule|timetable|time.?table|when|date/i.test(t))return"schedule";
+  if(/tips?|prepare|preparation|study|how\s+to/i.test(t))return"preparation";
+  return null;
+}
+
+function mergeContext(newEntities,newIntent){
+  newEntities.semesters.forEach(s=>{if(!convoState.semesters.includes(s))convoState.semesters.push(s);});
+  newEntities.courses.forEach(c=>{if(!convoState.courses.includes(c))convoState.courses.push(c);});
+  newEntities.dates.forEach(d=>{if(!convoState.dates.includes(d))convoState.dates.push(d);});
+  if(newIntent)convoState.intent=newIntent;
+  convoState.turnCount++;
+}
+
+function isThinQuery(text,newEntities){
+  const hasNoNew=newEntities.semesters.length===0&&newEntities.courses.length===0&&newEntities.dates.length===0;
+  const short=text.trim().split(/\s+/).length<=6;
+  return hasNoNew&&short;
+}
+
+function renderCtxBar(){
+  const p=document.getElementById("ctx-pills");
+  const items=[];
+  convoState.semesters.forEach(s=>items.push({t:"sem",l:s}));
+  convoState.courses.forEach(c=>items.push({t:"course",l:c}));
+  convoState.dates.forEach(d=>items.push({t:"date",l:d}));
+  if(convoState.intent)items.push({t:"intent",l:convoState.intent});
+  if(!items.length){p.innerHTML='<span style="font-size:11px;color:var(--color-text-tertiary);font-style:italic">No context yet</span>';return;}
+  p.innerHTML=items.map(i=>`<span class="cpill ${i.t}"><span class="cdot"></span>${i.l}</span>`).join("");
+}
+
+function addMsg(role,html,extras){
+  const c=document.getElementById("msgs");
+  const row=document.createElement("div");row.className="row "+role;
+  const av=document.createElement("div");av.className="av "+role;av.textContent=role==="bot"?"AI":"U";
+  const bub=document.createElement("div");bub.className="bub "+role;
+  bub.innerHTML=html;
+  if(extras){
+    if(extras.resolved){
+      bub.innerHTML+=`<div class="resolve-note">Used context: ${extras.resolved}</div>`;
+    }
+    if(extras.pills&&extras.pills.length){
+      bub.innerHTML+=`<div class="epills">${extras.pills.map(p=>`<span class="cpill ${p.t}"><span class="cdot"></span>${p.l}</span>`).join("")}</div>`;
+    }
+  }
+  if(role==="bot"&&convoState.turnCount>0){
+    const badge=document.createElement("div");badge.style.cssText="display:flex;justify-content:flex-end;margin-top:4px";
+    badge.innerHTML=`<span class="turn-badge">turn ${convoState.turnCount}</span>`;
+    const wrap=document.createElement("div");
+    wrap.appendChild(bub);wrap.appendChild(badge);
+    row.appendChild(av);row.appendChild(wrap);
+  }else{
+    row.appendChild(av);row.appendChild(bub);
+  }
+  c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+
+function showTyping(){
+  const c=document.getElementById("msgs");
+  const row=document.createElement("div");row.className="row";row.id="typ";
+  const av=document.createElement("div");av.className="av bot";av.textContent="AI";
+  const bub=document.createElement("div");bub.className="bub bot typing-bub";
+  bub.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  row.appendChild(av);row.appendChild(bub);c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function removeTyping(){const e=document.getElementById("typ");if(e)e.remove();}
+
+function buildContextSummary(){
+  const parts=[];
+  if(convoState.semesters.length)parts.push("Semester: "+convoState.semesters.join(", "));
+  if(convoState.courses.length)parts.push("Course/Subject: "+convoState.courses.join(", "));
+  if(convoState.dates.length)parts.push("Date: "+convoState.dates.join(", "));
+  if(convoState.intent)parts.push("Topic intent: "+convoState.intent);
+  return parts.join(" | ")||"none";
+}
+
+function detectResolved(newEntities,wasThин){
+  if(!wasThin)return null;
+  const used=[];
+  if(convoState.semesters.length)used.push(...convoState.semesters.map(s=>({t:"sem",l:s})));
+  if(convoState.courses.length)used.push(...convoState.courses.map(c=>({t:"course",l:c})));
+  if(convoState.dates.length)used.push(...convoState.dates.map(d=>({t:"date",l:d})));
+  return used.length?used:null;
+}
+
+async function send(){
+  const inp=document.getElementById("inp");
+  const btn=document.getElementById("sbtn");
+  const text=inp.value.trim();
+  if(!text)return;
+  addMsg("user",text,null);
+  inp.value="";btn.disabled=true;
+
+  const newEntities=extractEntities(text);
+  const newIntent=detectIntent(text);
+  const wasThin=isThinQuery(text,newEntities);
+  mergeContext(newEntities,newIntent);
+  renderCtxBar();
+
+  showTyping();
+  await new Promise(r=>setTimeout(r,500+Math.random()*400));
+
+  const resolvedItems=detectResolved(newEntities,wasThin);
+  const resolvedStr=resolvedItems?resolvedItems.map(i=>i.l).join(", "):null;
+
+  const ctxSummary=buildContextSummary();
+  const systemPrompt=`You are a context-aware academic assistant chatbot for university students. You maintain conversation context across multiple turns.
+
+CURRENT CONVERSATION CONTEXT (accumulated from all turns so far):
+${ctxSummary}
+
+CONVERSATION TURN: ${convoState.turnCount}
+
+INSTRUCTIONS:
+- The user may send short follow-up messages like "For third year?" or "What about CS?" without repeating earlier context.
+- Use the accumulated context above to resolve these follow-ups naturally.
+- When answering, explicitly acknowledge what context you're using when it was from a prior turn (e.g., "For your SEM 3 question about...").
+- If this appears to be a follow-up (turn > 1), seamlessly merge old context with new info.
+- Keep responses concise (2-4 sentences). No markdown. No bullet points. Plain conversational text.
+- Sound helpful and natural, like a knowledgeable senior student.`;
+
+  apiHistory.push({role:"user",content:text});
+
+  let reply="";
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system:systemPrompt,
+        messages:apiHistory
+      })
+    });
+    const data=await res.json();
+    reply=data.content?.[0]?.text||"Sorry, I couldn't process that. Please try again.";
+    apiHistory.push({role:"assistant",content:reply});
+    if(apiHistory.length>12)apiHistory=apiHistory.slice(-12);
+  }catch(e){
+    reply="Connection issue. Using local context: "+ctxSummary||"No context yet.";
+  }
+
+  removeTyping();
+
+  const newPills=[
+    ...newEntities.semesters.map(s=>({t:"sem",l:s})),
+    ...newEntities.courses.map(c=>({t:"course",l:c})),
+    ...newEntities.dates.map(d=>({t:"date",l:d}))
+  ];
+
+  addMsg("bot",reply,{
+    resolved:resolvedStr?`<b>${resolvedStr}</b> (from earlier turns)`:null,
+    pills:newPills.length?newPills:null
+  });
+
+  btn.disabled=false;inp.focus();
+}
+
+function fs(t){document.getElementById("inp").value=t;send();}
+
+function resetConvo(){
+  convoState={semesters:[],courses:[],dates:[],intent:null,turnCount:0};
+  apiHistory=[];
+  document.getElementById("msgs").innerHTML="";
+  renderCtxBar();
+  addMsg("bot","Conversation cleared. Start fresh — ask me about any exam, course, or semester schedule!",null);
+}
+
+document.getElementById("inp").addEventListener("keydown",e=>{if(e.key==="Enter")send();});
+
+addMsg("bot","Hi! I remember context across your messages. Start with something vague like \"When is the exam?\" and follow up with \"For third year?\" or \"What about CS?\" — I'll piece it all together.",null);
+renderCtxBar();
+</script>
