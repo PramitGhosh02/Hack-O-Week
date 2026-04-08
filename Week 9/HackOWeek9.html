@@ -1,0 +1,535 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+
+#root{display:flex;flex-direction:column;gap:0}
+
+/* TAB BAR */
+#tabbar{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.tab{flex:1;padding:10px 4px;font-size:12px;font-weight:500;color:var(--color-text-secondary);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:5px;transition:color .15s}
+.tab:hover{color:var(--color-text-primary)}
+.tab.active{color:#185FA5;border-bottom-color:#185FA5}
+.tab-icon{width:14px;height:14px;flex-shrink:0}
+
+/* SHARED ENGINE STATUS */
+#engine-bar{padding:6px 14px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.eng-label{font-size:10.5px;color:var(--color-text-tertiary);font-weight:500}
+.eng-pill{font-size:10.5px;padding:2px 8px;border-radius:99px;font-weight:500}
+.eng-pill.sem{background:#FAEEDA;color:#633806}
+.eng-pill.course{background:#EAF3DE;color:#27500A}
+.eng-pill.date{background:#E6F1FB;color:#0C447C}
+.eng-pill.intent{background:#EEEDFE;color:#3C3489}
+.eng-pill.channel{background:#E1F5EE;color:#085041}
+#eng-pills{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+#sync-badge{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:99px;background:#EAF3DE;color:#27500A;font-weight:500;white-space:nowrap}
+
+/* PANELS */
+.panel{display:none}
+.panel.active{display:flex;flex-direction:column}
+
+/* ── WEB PANEL ── */
+#web-panel{height:520px}
+#web-chrome{background:#E6F1FB;padding:6px 12px;display:flex;align-items:center;gap:8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+#web-chrome .dot-row{display:flex;gap:4px}
+.wdot{width:8px;height:8px;border-radius:50%}
+.wdot.r{background:#E24B4A}.wdot.y{background:#EF9F27}.wdot.g{background:#639922}
+#web-urlbar{flex:1;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:5px;padding:3px 10px;font-size:11px;color:var(--color-text-secondary)}
+#web-body{display:flex;flex:1;overflow:hidden}
+#web-sidebar{width:200px;border-right:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);padding:12px 10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.sb-head{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em;padding:4px 6px}
+.sb-item{padding:6px 8px;border-radius:6px;font-size:12px;color:var(--color-text-secondary);cursor:pointer;display:flex;align-items:center;gap:6px}
+.sb-item:hover,.sb-item.active{background:var(--color-background-primary);color:var(--color-text-primary)}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:#378ADD;flex-shrink:0}
+#web-chat{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#web-chat-hdr{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px}
+.chat-av{width:28px;height:28px;border-radius:50%;background:#185FA5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#E6F1FB;flex-shrink:0}
+#web-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+#web-input-row{padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:8px;align-items:center}
+#web-inp{flex:1;padding:7px 12px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:12.5px;outline:none}
+#web-inp:focus{border-color:#378ADD}
+.send-btn{width:30px;height:30px;border-radius:50%;border:none;background:#185FA5;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send-btn:hover{background:#0C447C}
+.send-btn:disabled{background:var(--color-border-tertiary);cursor:default}
+.web-chips{display:flex;gap:5px;flex-wrap:wrap;padding:6px 14px}
+.wchip{font-size:11px;padding:3px 9px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+.wchip:hover{border-color:#378ADD;color:var(--color-text-primary)}
+
+/* ── MOBILE PANEL ── */
+#mob-panel{align-items:center;padding:16px 0;background:var(--color-background-secondary);min-height:560px}
+#phone-frame{width:280px;border:1.5px solid var(--color-border-secondary);border-radius:32px;overflow:hidden;background:var(--color-background-primary);display:flex;flex-direction:column}
+#phone-status{background:#185FA5;padding:8px 16px;display:flex;align-items:center;justify-content:space-between}
+.ps-time{font-size:11px;font-weight:500;color:#E6F1FB}
+.ps-icons{display:flex;gap:4px;align-items:center}
+.ps-bar{width:3px;border-radius:1px;background:#B5D4F4}
+#mob-hdr{background:#185FA5;padding:10px 12px;display:flex;align-items:center;gap:8px}
+.mob-back{color:#B5D4F4;font-size:14px;cursor:pointer}
+.mob-av{width:32px;height:32px;border-radius:50%;background:#0C447C;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#E6F1FB;flex-shrink:0}
+.mob-hdr-text p:first-child{font-size:13px;font-weight:500;color:#E6F1FB}
+.mob-hdr-text p:last-child{font-size:10px;color:#B5D4F4}
+#mob-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;min-height:280px;max-height:320px;background:#f0f0f0}
+#mob-msgs *{font-family:var(--font-sans)}
+#mob-input-area{padding:8px 10px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:6px;align-items:center;background:var(--color-background-primary)}
+#mob-inp{flex:1;padding:6px 10px;border-radius:18px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:12px;outline:none}
+#mob-inp:focus{border-color:#378ADD}
+#phone-home{background:#F1EFE8;padding:10px 16px;display:flex;justify-content:center}
+.home-bar{width:80px;height:3px;border-radius:99px;background:var(--color-border-secondary)}
+
+/* ── WHATSAPP / CLI PANEL ── */
+#wa-panel{height:520px;flex-direction:column}
+#wa-chrome{background:#3B6D11;padding:8px 14px;display:flex;align-items:center;gap:10px}
+#wa-chrome p{font-size:12px;font-weight:500;color:#EAF3DE}
+#wa-chrome span{font-size:11px;color:#9FE1CB}
+#wa-term{flex:1;background:#1a1a1a;font-family:var(--font-mono);font-size:12px;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:2px}
+.tline{line-height:1.6;white-space:pre-wrap;word-break:break-all}
+.tline.sys{color:#888780}
+.tline.in{color:#9FE1CB}
+.tline.out{color:#E6F1FB}
+.tline.warn{color:#FAC775}
+.tline.err{color:#F09595}
+.tline.info{color:#85B7EB}
+.tline.entity{color:#AFA9EC}
+.tline.prompt{color:#5DCAA5}
+#wa-input-row{padding:10px 14px;background:#111;border-top:1px solid #333;display:flex;gap:8px;align-items:center}
+#wa-inp{flex:1;padding:7px 12px;border-radius:4px;border:1px solid #333;background:#222;color:#EAF3DE;font-family:var(--font-mono);font-size:12px;outline:none}
+#wa-inp:focus{border-color:#3B6D11}
+#wa-inp::placeholder{color:#5F5E5A}
+.wa-send{padding:7px 14px;border-radius:4px;border:none;background:#3B6D11;color:#EAF3DE;cursor:pointer;font-family:var(--font-mono);font-size:12px}
+.wa-send:hover{background:#27500A}
+.wa-sugs{padding:6px 14px;background:#111;display:flex;gap:6px;flex-wrap:wrap}
+.wa-sg{font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid #333;background:transparent;color:#888780;cursor:pointer;font-family:var(--font-mono)}
+.wa-sg:hover{border-color:#3B6D11;color:#9FE1CB}
+
+/* SHARED MSG STYLES */
+.row{display:flex;gap:6px;align-items:flex-end}
+.row.user{flex-direction:row-reverse}
+.bub{padding:7px 10px;border-radius:12px;font-size:12px;line-height:1.5;max-width:85%;color:var(--color-text-primary)}
+.bub.bot{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-bottom-left-radius:3px}
+.bub.user{background:#185FA5;color:#E6F1FB;border-bottom-right-radius:3px}
+.bub.mob-bot{background:white;border-radius:12px;border-bottom-left-radius:3px;font-size:12px;line-height:1.5;padding:7px 10px;max-width:85%;color:#111}
+.bub.mob-user{background:#dcf8c6;border-radius:12px;border-bottom-right-radius:3px;font-size:12px;line-height:1.5;padding:7px 10px;max-width:85%;color:#111;margin-left:auto}
+.ts{font-size:10px;color:#888;text-align:right;margin-top:2px}
+.chip-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.chip{font-size:10.5px;padding:2px 8px;border-radius:99px;border:0.5px solid #378ADD;color:#185FA5;cursor:pointer;background:transparent}
+.chip:hover{background:#E6F1FB}
+.mob-chip{font-size:10.5px;padding:2px 8px;border-radius:99px;border:0.5px solid #2196F3;color:#0d47a1;cursor:pointer;background:white;margin-top:4px;margin-right:4px;display:inline-block}
+.typing{display:flex;gap:3px;align-items:center;padding:6px 8px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--color-text-secondary);animation:bop 1.2s infinite;opacity:.4}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+</style>
+
+<div id="root">
+  <div id="tabbar">
+    <button class="tab active" onclick="switchTab('web')" id="tab-web">
+      <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Web portal
+    </button>
+    <button class="tab" onclick="switchTab('mob')" id="tab-mob">
+      <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      Mobile app
+    </button>
+    <button class="tab" onclick="switchTab('wa')" id="tab-wa">
+      <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      WhatsApp / CLI
+    </button>
+  </div>
+
+  <div id="engine-bar">
+    <span class="eng-label">Shared engine state:</span>
+    <div id="eng-pills"><span style="font-size:10.5px;color:var(--color-text-tertiary);font-style:italic">Waiting for first message…</span></div>
+    <span id="sync-badge">synced across channels</span>
+  </div>
+
+  <!-- WEB PANEL -->
+  <div class="panel active" id="web-panel">
+    <div id="web-chrome">
+      <div class="dot-row"><div class="wdot r"></div><div class="wdot y"></div><div class="wdot g"></div></div>
+      <div id="web-urlbar">university.edu/academic-bot</div>
+    </div>
+    <div id="web-body">
+      <div id="web-sidebar">
+        <div class="sb-head">Quick links</div>
+        <div class="sb-item active"><div class="sb-dot"></div>Bot chat</div>
+        <div class="sb-item">Exam schedule</div>
+        <div class="sb-item">Results portal</div>
+        <div class="sb-item">Help desk</div>
+        <div style="flex:1"></div>
+        <div class="sb-item" style="font-size:11px;color:var(--color-text-tertiary)">Logged in as: Student</div>
+      </div>
+      <div id="web-chat">
+        <div id="web-chat-hdr">
+          <div class="chat-av">AI</div>
+          <div><p style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Academic Bot</p><p style="font-size:11px;color:var(--color-text-secondary)">Web · Rich UI mode</p></div>
+          <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+            <div style="width:7px;height:7px;border-radius:50%;background:#639922"></div>
+            <span style="font-size:11px;color:var(--color-text-secondary)">Online</span>
+          </div>
+        </div>
+        <div id="web-msgs"></div>
+        <div class="web-chips" id="web-chips">
+          <span class="wchip" onclick="webSend('When is SEM 5 CS exam?')">SEM 5 CS exam</span>
+          <span class="wchip" onclick="webSend('Show SEM 3 DBMS schedule')">SEM 3 DBMS</span>
+          <span class="wchip" onclick="webSend('What are my options for revaluation?')">Revaluation</span>
+          <span class="wchip" onclick="webSend('blah blah test unclear')">Unclear query</span>
+        </div>
+        <div id="web-input-row">
+          <input id="web-inp" type="text" placeholder="Ask about exams, courses, schedules…" autocomplete="off"/>
+          <button class="send-btn" id="web-sbtn" onclick="webSend()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE PANEL -->
+  <div class="panel" id="mob-panel">
+    <div id="phone-frame">
+      <div id="phone-status">
+        <span class="ps-time">9:41</span>
+        <div class="ps-icons">
+          <div style="display:flex;gap:2px;align-items:flex-end">
+            <div class="ps-bar" style="height:4px"></div><div class="ps-bar" style="height:6px"></div><div class="ps-bar" style="height:8px"></div><div class="ps-bar" style="height:10px"></div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#B5D4F4" stroke="none"><path d="M1.5 8.5a13 13 0 0 1 21 0M5 12a10 10 0 0 1 14 0M8.5 15.5a6 6 0 0 1 7 0M12 19h.01"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5D4F4" stroke-width="2"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v2"/></svg>
+        </div>
+      </div>
+      <div id="mob-hdr">
+        <span class="mob-back">&#8592;</span>
+        <div class="mob-av">AI</div>
+        <div class="mob-hdr-text"><p>Academic Bot</p><p>Mobile · compact mode</p></div>
+      </div>
+      <div id="mob-msgs" style="background:#e5ddd5"></div>
+      <div id="mob-input-area">
+        <input id="mob-inp" type="text" placeholder="Message…" autocomplete="off"/>
+        <button class="send-btn" id="mob-sbtn" onclick="mobSend()" style="background:#3B6D11;width:28px;height:28px">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+        </button>
+      </div>
+      <div id="phone-home"><div class="home-bar"></div></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+      <span class="wchip" onclick="mobQuick('SEM 6 exam date?')">SEM 6 exam?</span>
+      <span class="wchip" onclick="mobQuick('CS results?')">CS results?</span>
+      <span class="wchip" onclick="mobQuick('hostel fee info')">Out-of-scope</span>
+      <span class="wchip" onclick="mobQuick('For 3rd year?')">Follow-up</span>
+    </div>
+  </div>
+
+  <!-- WHATSAPP CLI PANEL -->
+  <div class="panel" id="wa-panel">
+    <div id="wa-chrome">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9FE1CB" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,9 21,9"/><polyline points="9,21 9,9"/></svg>
+      <p>WhatsApp Bot · CLI Simulator</p>
+      <span>webhook → engine → text-only response</span>
+    </div>
+    <div id="wa-term"></div>
+    <div class="wa-sugs">
+      <button class="wa-sg" onclick="waQuick('When is SEM 5 CS exam?')">SEM 5 CS exam</button>
+      <button class="wa-sg" onclick="waQuick('hi')">hi</button>
+      <button class="wa-sg" onclick="waQuick('blah blah')">gibberish</button>
+      <button class="wa-sg" onclick="waQuick('1')">reply 1 (menu)</button>
+      <button class="wa-sg" onclick="waQuick('fee info')">out-of-scope</button>
+      <button class="wa-sg" onclick="waQuick('For third year?')">follow-up</button>
+    </div>
+    <div id="wa-input-row">
+      <input id="wa-inp" type="text" placeholder="Type a WhatsApp message…" autocomplete="off"/>
+      <button class="wa-send" onclick="waSend()">SEND</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTHS=["january","february","march","april","may","june","july","august","september","october","november","december"];
+const MSHORT=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+
+const sharedEngine={
+  state:{sems:[],courses:[],dates:[],intent:null,turns:0,lastChannel:null},
+  apiHistory:[],
+  extractEntities(text){
+    const e={sems:[],courses:[],dates:[]};let m;
+    const s=/\bsem(?:ester)?\s*[-:]?\s*(\d+)\b/gi;
+    while((m=s.exec(text))!==null){const v="SEM "+m[1];if(!e.sems.includes(v))e.sems.push(v);}
+    const y=/\b(\d+)(?:st|nd|rd|th)\s+year\b/gi;
+    while((m=y.exec(text))!==null){const v="SEM "+((parseInt(m[1])-1)*2+1);if(!e.sems.includes(v))e.sems.push(v);}
+    const words={first:1,second:2,third:3,fourth:4};
+    Object.entries(words).forEach(([w,n])=>{if(new RegExp("\\b"+w+"\\s+year\\b","i").test(text)){const v="SEM "+((n-1)*2+1);if(!e.sems.includes(v))e.sems.push(v);}});
+    const c=/\b([A-Z]{2,6})\s*(\d{3,4})\b/g;
+    while((m=c.exec(text))!==null){const v=m[1]+m[2];if(!e.courses.includes(v)&&!["SEM"].includes(m[1]))e.courses.push(v);}
+    const subs={cs:"Computer Science",cse:"CS Engineering",ece:"Electronics",dbms:"Database Mgmt",os:"Operating Systems",cn:"Computer Networks",math:"Mathematics"};
+    Object.entries(subs).forEach(([k,v])=>{if(new RegExp("\\b"+k+"\\b","i").test(text)&&!e.courses.includes(v))e.courses.push(v);});
+    const dp={re:/\b(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/gi,fn:m=>`${m[1]} ${MONTHS[MSHORT.indexOf(m[2].toLowerCase())][0].toUpperCase()+MONTHS[MSHORT.indexOf(m[2].toLowerCase())].slice(1)}`};
+    while((m=dp.re.exec(text))!==null){const d=dp.fn(m);if(!e.dates.includes(d))e.dates.push(d);}
+    return e;
+  },
+  mergeCtx(e,channel){
+    e.sems.forEach(s=>{if(!this.state.sems.includes(s))this.state.sems.push(s);});
+    e.courses.forEach(c=>{if(!this.state.courses.includes(c))this.state.courses.push(c);});
+    e.dates.forEach(d=>{if(!this.state.dates.includes(d))this.state.dates.push(d);});
+    this.state.turns++;this.state.lastChannel=channel;
+  },
+  classify(text){
+    const t=text.toLowerCase().trim();
+    const words=t.split(/\s+/).filter(Boolean);
+    if(/hack|cheat|illegal/i.test(t))return{type:"inappropriate"};
+    if(/fee|hostel|scholarship|admission|hostel|ragging|personal/i.test(t))return{type:"out_of_scope"};
+    if(/^(hi|hello|hey|yo|hii|helo)$/i.test(t.trim()))return{type:"greeting"};
+    if(/^\d$/.test(t.trim()))return{type:"menu_select",n:parseInt(t)};
+    if(words.length<=2&&!/sem|exam|course|result|syllabus|schedule/i.test(t))return{type:"vague"};
+    const noise=words.filter(w=>/^[^aeiou]{4,}$/i.test(w)).length/Math.max(words.length,1);
+    if(noise>0.5)return{type:"unclear"};
+    return{type:"academic"};
+  },
+  ctxSummary(){
+    const p=[];
+    if(this.state.sems.length)p.push("Sem: "+this.state.sems.join(", "));
+    if(this.state.courses.length)p.push("Course: "+this.state.courses.join(", "));
+    if(this.state.dates.length)p.push("Date: "+this.state.dates.join(", "));
+    return p.join(" | ")||"none";
+  },
+  updateEngineBar(){
+    const p=document.getElementById("eng-pills");
+    const items=[
+      ...this.state.sems.map(s=>({t:"sem",l:s})),
+      ...this.state.courses.map(c=>({t:"course",l:c})),
+      ...this.state.dates.map(d=>({t:"date",l:d}))
+    ];
+    if(this.state.lastChannel)items.push({t:"channel",l:this.state.lastChannel});
+    if(!items.length){p.innerHTML='<span style="font-size:10.5px;color:var(--color-text-tertiary);font-style:italic">Waiting for first message…</span>';return;}
+    p.innerHTML=items.map(i=>`<span class="eng-pill ${i.t}">${i.l}</span>`).join("");
+  },
+  async callAPI(userText, channelMode){
+    const ctx=this.ctxSummary();
+    const sys=`You are an academic chatbot. Channel: ${channelMode}. Context: ${ctx}. Turn: ${this.state.turns}.
+Rules for ${channelMode}:
+${channelMode==="web"?"- Use friendly full sentences, 2-3 lines. Mention rich UI features exist.":""}
+${channelMode==="mobile"?"- Be very concise, max 2 short sentences. Mobile users need quick answers.":""}
+${channelMode==="whatsapp"?"- Plain text only. No markdown. Max 2 sentences. Use numbered options when appropriate. No emojis.":""}
+- Never fabricate exam dates. If unsure, say so and suggest checking the official portal.
+- Sound like a helpful senior student, not a formal chatbot.`;
+    this.apiHistory.push({role:"user",content:userText});
+    let reply="";
+    try{
+      const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:sys,messages:this.apiHistory})});
+      const d=await r.json();
+      reply=d.content?.[0]?.text||"";
+      this.apiHistory.push({role:"assistant",content:reply});
+      if(this.apiHistory.length>14)this.apiHistory=this.apiHistory.slice(-14);
+    }catch(e){reply="";}
+    return reply;
+  }
+};
+
+function switchTab(t){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("tab-"+t).classList.add("active");
+  document.getElementById(t+"-panel").classList.add("active");
+}
+
+function now(){return new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
+
+/* ── WEB CHANNEL ── */
+function webAddMsg(role,html,chips){
+  const c=document.getElementById("web-msgs");
+  const row=document.createElement("div");row.className="row"+(role==="user"?" user":"");
+  if(role==="bot"){
+    const av=document.createElement("div");av.className="chat-av";av.textContent="AI";
+    const bub=document.createElement("div");bub.className="bub bot";bub.innerHTML=html;
+    if(chips&&chips.length){const cr=document.createElement("div");cr.className="chip-row";chips.forEach(ch=>{const s=document.createElement("span");s.className="chip";s.textContent=ch.label;s.onclick=()=>webSend(ch.value||ch.label);cr.appendChild(s);});bub.appendChild(cr);}
+    row.appendChild(av);row.appendChild(bub);
+  }else{
+    const bub=document.createElement("div");bub.className="bub user";bub.textContent=html;row.appendChild(bub);
+  }
+  c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function webShowTyping(){const c=document.getElementById("web-msgs");const r=document.createElement("div");r.className="row";r.id="wtyp";const av=document.createElement("div");av.className="chat-av";av.textContent="AI";const b=document.createElement("div");b.className="bub bot typing";b.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';r.appendChild(av);r.appendChild(b);c.appendChild(r);c.scrollTop=c.scrollHeight;}
+function webRemoveTyping(){const e=document.getElementById("wtyp");if(e)e.remove();}
+
+async function webSend(preset){
+  const inp=document.getElementById("web-inp");const btn=document.getElementById("web-sbtn");
+  const text=(preset||inp.value).trim();if(!text)return;
+  inp.value="";btn.disabled=true;
+  webAddMsg("user",text,null);
+  const ents=sharedEngine.extractEntities(text);
+  sharedEngine.mergeCtx(ents,"web");
+  sharedEngine.updateEngineBar();
+  const cls=sharedEngine.classify(text);
+  webShowTyping();
+  await new Promise(r=>setTimeout(r,600+Math.random()*400));
+  webRemoveTyping();
+  let reply="",chips=[];
+  if(cls.type==="greeting"){reply="Welcome to the University Academic Portal! I can help with exam schedules, course info, results, and semester planning. What would you like to know?";chips=[{label:"Exam schedule"},{label:"Course syllabus"},{label:"Results portal"}];}
+  else if(cls.type==="inappropriate"){reply="That request is outside what I can help with. I handle academic queries only — exams, schedules, courses, results.";chips=[{label:"Exam schedule"},{label:"Contact help desk",value:"I need to contact a human advisor"}];}
+  else if(cls.type==="out_of_scope"){reply="That topic is beyond my scope. For non-academic matters like fees or hostel, please visit the admin portal or contact the main office directly.";chips=[{label:"Email advisor",value:"How do I email an academic advisor?"},{label:"Help desk link",value:"Help desk portal link"}];}
+  else if(cls.type==="vague"||cls.type==="unclear"){
+    const ctx=sharedEngine.ctxSummary();
+    const sugs=sharedEngine.state.sems.length?[{label:sharedEngine.state.sems[0]+" exam dates"},{label:sharedEngine.state.sems[0]+" syllabus"},{label:sharedEngine.state.sems[0]+" results"}]:[{label:"SEM 5 CS exam"},{label:"SEM 3 DBMS schedule"},{label:"SEM 6 results"}];
+    reply="Could you be more specific? I want to give you the most accurate answer.";chips=sugs;
+  }else if(cls.type==="academic"){
+    reply=await sharedEngine.callAPI(text,"web");
+    if(!reply)reply="I have context on "+sharedEngine.ctxSummary()+". Exam dates are confirmed on the official university portal — please check there for exact timings.";
+  }
+  webAddMsg("bot",reply,chips);
+  btn.disabled=false;inp.focus();
+}
+document.getElementById("web-inp").addEventListener("keydown",e=>{if(e.key==="Enter")webSend();});
+webAddMsg("bot","Welcome to the Academic Portal. I can help with exam schedules, results, course info, and semester planning. Use the quick chips below or type your question.",
+  [{label:"SEM 5 exam dates"},{label:"Course syllabus"},{label:"Talk to advisor",value:"I need to speak to a human advisor"}]);
+
+/* ── MOBILE CHANNEL ── */
+function mobAddMsg(role,html,chips){
+  const c=document.getElementById("mob-msgs");
+  const wrap=document.createElement("div");wrap.style.cssText="display:flex;flex-direction:column;margin-bottom:4px;align-items:"+(role==="user"?"flex-end":"flex-start");
+  const bub=document.createElement("div");bub.className=role==="user"?"bub mob-user":"bub mob-bot";bub.innerHTML=html;
+  const ts=document.createElement("div");ts.className="ts";ts.textContent=now();
+  if(chips&&chips.length){chips.forEach(ch=>{const s=document.createElement("span");s.className="mob-chip";s.textContent=ch;s.onclick=()=>mobSend(ch);bub.appendChild(s);});}
+  wrap.appendChild(bub);wrap.appendChild(ts);c.appendChild(wrap);c.scrollTop=c.scrollHeight;
+}
+function mobShowTyping(){const c=document.getElementById("mob-msgs");const w=document.createElement("div");w.id="mtyp";w.style.cssText="display:flex;align-items:flex-start;margin-bottom:4px";const b=document.createElement("div");b.className="bub mob-bot typing";b.innerHTML='<div class="dot" style="background:#888"></div><div class="dot" style="background:#888"></div><div class="dot" style="background:#888"></div>';w.appendChild(b);c.appendChild(w);c.scrollTop=c.scrollHeight;}
+function mobRemoveTyping(){const e=document.getElementById("mtyp");if(e)e.remove();}
+
+async function mobSend(preset){
+  const inp=document.getElementById("mob-inp");const btn=document.getElementById("mob-sbtn");
+  const text=(preset||inp.value).trim();if(!text)return;
+  inp.value="";btn.disabled=true;
+  mobAddMsg("user",text,null);
+  const ents=sharedEngine.extractEntities(text);
+  sharedEngine.mergeCtx(ents,"mobile");
+  sharedEngine.updateEngineBar();
+  const cls=sharedEngine.classify(text);
+  mobShowTyping();
+  await new Promise(r=>setTimeout(r,500+Math.random()*400));
+  mobRemoveTyping();
+  let reply="",chips=[];
+  if(cls.type==="greeting"){reply="Hi! Ask me about exams, results, or schedules.";chips=["SEM 5 exam","CS syllabus","My results"];}
+  else if(cls.type==="out_of_scope"){reply="That's outside my scope. Contact the admin office for this.";chips=["Email advisor","Help desk"];}
+  else if(cls.type==="inappropriate"){reply="I can only help with academic queries.";}
+  else if(cls.type==="vague"||cls.type==="unclear"){
+    const ctx=sharedEngine.state.sems.length;
+    chips=ctx?[sharedEngine.state.sems[0]+" exam",sharedEngine.state.sems[0]+" result"]:["SEM 5 exam","SEM 3 result","CS schedule"];
+    reply="Can you be more specific?";
+  }else if(cls.type==="academic"){
+    reply=await sharedEngine.callAPI(text,"mobile");
+    if(!reply)reply="Check the official portal for exact dates. Need anything else?";
+  }
+  mobAddMsg("bot",reply,chips);
+  btn.disabled=false;inp.focus();
+}
+function mobQuick(t){document.getElementById("mob-inp").value=t;mobSend();}
+document.getElementById("mob-inp").addEventListener("keydown",e=>{if(e.key==="Enter")mobSend();});
+mobAddMsg("bot","Hi! I'm your academic assistant. Ask about exams, results, or schedules.",["SEM 5 exam","Results","Syllabus"]);
+
+/* ── WHATSAPP CLI CHANNEL ── */
+let waMenuPending=false;
+let waTurnCount=0;
+
+function waLine(cls,text){
+  const c=document.getElementById("wa-term");
+  const d=document.createElement("div");d.className="tline "+cls;d.textContent=text;c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function waSep(){waLine("sys","─".repeat(48));}
+function waTyping(){return new Promise(r=>{waLine("sys","[bot is processing…]");setTimeout(r,600+Math.random()*500);});}
+function removeLastSysLine(){const c=document.getElementById("wa-term");const lines=c.querySelectorAll(".tline.sys");if(lines.length)lines[lines.length-1].remove();}
+
+async function waSend(preset){
+  const inp=document.getElementById("wa-inp");
+  const text=(preset||inp.value).trim();if(!text)return;
+  inp.value="";
+  waTurnCount++;
+  waSep();
+  waLine("sys","["+now()+"] Incoming webhook · turn #"+waTurnCount);
+  waLine("in","USER: "+text);
+
+  const ents=sharedEngine.extractEntities(text);
+  if(ents.sems.length||ents.courses.length||ents.dates.length){
+    waLine("entity","[entity] "+
+      (ents.sems.length?"sems="+ents.sems.join(",")+" ":"")+
+      (ents.courses.length?"courses="+ents.courses.join(",")+" ":"")+
+      (ents.dates.length?"dates="+ents.dates.join(","):""));
+  }
+  sharedEngine.mergeCtx(ents,"whatsapp");
+  sharedEngine.updateEngineBar();
+
+  const cls=sharedEngine.classify(text);
+  waLine("info","[classify] type="+cls.type+(cls.n?" sel="+cls.n:""));
+
+  if(waMenuPending&&cls.type==="menu_select"){
+    waMenuPending=false;
+    const opts={1:"Exam schedule",2:"Course syllabus",3:"Semester results",4:"Talk to advisor"};
+    const chosen=opts[cls.n];
+    if(chosen){
+      waLine("sys","[route] menu option "+cls.n+" → "+chosen);
+      await waTyping();removeLastSysLine();
+      if(cls.n===4){
+        waLine("out","BOT: Please contact your advisor:");
+        waLine("out","     Email: academic.advisor@university.edu");
+        waLine("out","     Help desk: university.edu/helpdesk");
+        waLine("out","     Call: +91-123-456-7890 (Mon-Fri 9am-5pm)");
+      }else{
+        const reply=await sharedEngine.callAPI("Tell me about "+chosen,"whatsapp");
+        const lines=(reply||"Please check the official portal for "+chosen+".").split("\n").filter(l=>l.trim());
+        lines.forEach(l=>waLine("out","BOT: "+l));
+      }
+    }else{waLine("warn","[warn] invalid menu option — re-showing menu");waShowMenu();}
+    return;
+  }
+
+  waMenuPending=false;
+  let reply="";
+  if(cls.type==="greeting"){
+    waLine("sys","[route] greeting → menu");
+    await waTyping();removeLastSysLine();
+    waLine("out","BOT: Hello! I am the University Academic Bot.");
+    waLine("out","BOT: Reply with a number:");
+    waShowMenu();waMenuPending=true;
+  }else if(cls.type==="out_of_scope"){
+    waLine("sys","[route] out-of-scope → escalate");
+    await waTyping();removeLastSysLine();
+    waLine("out","BOT: That topic is outside my scope.");
+    waLine("out","BOT: Contact: academic.advisor@university.edu");
+    waLine("out","BOT: Or visit: university.edu/helpdesk");
+  }else if(cls.type==="inappropriate"){
+    waLine("sys","[route] inappropriate → block");
+    await waTyping();removeLastSysLine();
+    waLine("out","BOT: I can only assist with academic queries.");
+    waLine("warn","[block] request rejected");
+  }else if(cls.type==="vague"||cls.type==="unclear"){
+    waLine("sys","[route] unclear → clarify");
+    await waTyping();removeLastSysLine();
+    const ctx=sharedEngine.ctxSummary();
+    if(ctx!=="none"){waLine("out","BOT: Context so far: "+ctx);}
+    waLine("out","BOT: Please be more specific. Example:");
+    waLine("out","BOT:   'When is SEM 5 CS exam?'");
+    waLine("out","BOT:   'SEM 3 DBMS syllabus'");
+  }else if(cls.type==="academic"||cls.type==="menu_select"){
+    waLine("sys","[route] academic → API call");
+    await waTyping();removeLastSysLine();
+    reply=await sharedEngine.callAPI(text,"whatsapp");
+    if(!reply)reply="Please check the official portal for accurate dates.";
+    const lines=reply.split("\n").filter(l=>l.trim());
+    lines.slice(0,4).forEach(l=>waLine("out","BOT: "+l));
+    if(sharedEngine.state.sems.length||sharedEngine.state.courses.length){
+      waLine("out","BOT: For exact info, visit: university.edu/exams");
+    }
+  }
+  waLine("sys","[done] ctx="+sharedEngine.ctxSummary());
+}
+
+function waShowMenu(){
+  waLine("out","BOT:   1. Exam schedule");
+  waLine("out","BOT:   2. Course syllabus");
+  waLine("out","BOT:   3. Semester results");
+  waLine("out","BOT:   4. Talk to advisor");
+}
+function waQuick(t){document.getElementById("wa-inp").value=t;waSend();}
+document.getElementById("wa-inp").addEventListener("keydown",e=>{if(e.key==="Enter")waSend();});
+
+waLine("sys","University Academic Bot — WhatsApp Gateway Simulator");
+waLine("sys","All messages processed through shared engine");
+waLine("sys","Format: USER input → [classify] → [route] → BOT output");
+waSep();
+waLine("prompt","Type a message or pick a scenario above to begin…");
+</script>
