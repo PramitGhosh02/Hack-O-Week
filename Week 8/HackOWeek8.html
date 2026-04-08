@@ -1,0 +1,331 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#root{font-family:var(--font-sans);display:flex;flex-direction:column;height:680px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+#hdr{padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);display:flex;align-items:center;gap:10px}
+.hico{width:32px;height:32px;background:#185FA5;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#hdr h2{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+#hdr p{font-size:11.5px;color:var(--color-text-secondary)}
+.online-dot{width:7px;height:7px;border-radius:50%;background:#639922;margin-left:auto;flex-shrink:0}
+#ctx-bar{padding:7px 16px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:34px}
+#ctx-label{font-size:10.5px;color:var(--color-text-tertiary);font-weight:500;white-space:nowrap}
+#ctx-pills{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.cpill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:500}
+.cpill.sem{background:#FAEEDA;color:#633806}.cpill.course{background:#EAF3DE;color:#27500A}.cpill.date{background:#E6F1FB;color:#0C447C}
+.cdot{width:4px;height:4px;border-radius:50%}
+.cpill.sem .cdot{background:#854F0B}.cpill.course .cdot{background:#3B6D11}.cpill.date .cdot{background:#185FA5}
+.mode-badge{margin-left:auto;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500;white-space:nowrap}
+.mode-badge.normal{background:#EAF3DE;color:#27500A}
+.mode-badge.clarify{background:#FAEEDA;color:#633806}
+.mode-badge.escalate{background:#FCEBEB;color:#A32D2D}
+#msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;align-items:flex-start}
+.row.user{flex-direction:row-reverse}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.av.bot{background:#185FA5;color:#E6F1FB}
+.av.user{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.av.system{background:#EEEDFE;color:#3C3489}
+.bub{max-width:82%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.6;color:var(--color-text-primary)}
+.bub.bot{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-top-left-radius:4px}
+.bub.user{background:#185FA5;color:#E6F1FB;border-top-right-radius:4px}
+.bub.system{background:#EEEDFE;border:0.5px solid #AFA9EC;border-radius:10px;font-size:12px;color:#3C3489;width:100%;max-width:100%;text-align:center;padding:7px 12px}
+.fallback-card{margin-top:8px;border:0.5px solid var(--color-border-tertiary);border-radius:10px;overflow:hidden;background:var(--color-background-primary)}
+.fc-header{padding:8px 12px;font-size:11px;font-weight:500;display:flex;align-items:center;gap:6px}
+.fc-header.clarify{background:#FAEEDA;color:#633806}
+.fc-header.suggest{background:#E6F1FB;color:#0C447C}
+.fc-header.escalate{background:#FCEBEB;color:#A32D2D}
+.fc-header.oos{background:#EEEDFE;color:#3C3489}
+.fc-body{padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.fc-chip-row{display:flex;flex-wrap:wrap;gap:5px}
+.fc-chip{padding:4px 11px;border-radius:99px;font-size:11.5px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-family:var(--font-sans)}
+.fc-chip:hover{background:var(--color-background-secondary);border-color:var(--color-border-primary)}
+.fc-chip.action{background:#185FA5;color:#E6F1FB;border-color:#185FA5}
+.fc-chip.action:hover{background:#0C447C;border-color:#0C447C}
+.fc-chip.warn{background:#FCEBEB;color:#A32D2D;border-color:#F09595}
+.fc-chip.warn:hover{background:#F7C1C1}
+.escalate-box{margin-top:8px;border:0.5px solid #F09595;border-radius:10px;overflow:hidden}
+.esc-head{background:#FCEBEB;padding:8px 12px;font-size:11.5px;font-weight:500;color:#A32D2D;display:flex;align-items:center;gap:6px}
+.esc-body{padding:10px 12px;display:flex;flex-direction:column;gap:7px;background:var(--color-background-primary)}
+.esc-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:8px;cursor:pointer;text-decoration:none}
+.esc-row:hover{background:var(--color-background-secondary);border-color:var(--color-border-secondary)}
+.esc-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.esc-icon.email{background:#E6F1FB}.esc-icon.desk{background:#EAF3DE}.esc-icon.call{background:#FAEEDA}
+.esc-text p{font-size:12.5px;font-weight:500;color:var(--color-text-primary)}
+.esc-text span{font-size:11px;color:var(--color-text-secondary)}
+.conf-meter{margin-top:6px;display:flex;align-items:center;gap:8px}
+.conf-label{font-size:10.5px;color:var(--color-text-tertiary);white-space:nowrap}
+.conf-bar{flex:1;height:4px;border-radius:99px;background:var(--color-border-tertiary);overflow:hidden}
+.conf-fill{height:100%;border-radius:99px;transition:width .4s}
+.typing-bub{display:flex;gap:4px;align-items:center;padding:10px 13px}
+.dot{width:5px;height:5px;background:var(--color-text-secondary);border-radius:50%;animation:bop 1.2s infinite;opacity:.4}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+#footer{padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+#irow{display:flex;gap:8px;align-items:center}
+#inp{flex:1;padding:8px 14px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:13px;outline:none}
+#inp:focus{border-color:#378ADD;box-shadow:0 0 0 2px rgba(55,138,221,.12)}
+#sbtn{width:34px;height:34px;border-radius:50%;border:none;background:#185FA5;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#sbtn:hover{background:#0C447C}
+#sbtn:disabled{background:var(--color-border-tertiary);cursor:default}
+.sugs{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.sg{font-size:11px;padding:3px 9px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+.sg:hover{border-color:#378ADD;color:var(--color-text-primary)}
+</style>
+
+<div id="root">
+  <div id="hdr">
+    <div class="hico">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="white" stroke="none"/><circle cx="12" cy="10" r="1" fill="white" stroke="none"/><circle cx="15" cy="10" r="1" fill="white" stroke="none"/></svg>
+    </div>
+    <div>
+      <h2>Academic Advisor Bot</h2>
+      <p>Smart fallbacks · Clarification · Human handover</p>
+    </div>
+    <div class="online-dot" title="Advisors online"></div>
+  </div>
+  <div id="ctx-bar">
+    <span id="ctx-label">Context:</span>
+    <div id="ctx-pills"><span style="font-size:10.5px;color:var(--color-text-tertiary);font-style:italic">No context yet</span></div>
+    <span class="mode-badge normal" id="mode-badge">answering</span>
+  </div>
+  <div id="msgs"></div>
+  <div id="footer">
+    <div id="irow">
+      <input id="inp" type="text" placeholder="Ask anything about exams, schedule, courses…" autocomplete="off"/>
+      <button id="sbtn" onclick="send()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+      </button>
+    </div>
+    <div class="sugs">
+      <button class="sg" onclick="fs('blah blah something random')">Gibberish input</button>
+      <button class="sg" onclick="fs('What is the fee structure?')">Out-of-scope: fees</button>
+      <button class="sg" onclick="fs('exam')">Too vague: just \"exam\"</button>
+      <button class="sg" onclick="fs('I have a personal problem with my professor')">Sensitive issue</button>
+      <button class="sg" onclick="fs('When is SEM 5 CS exam?')">Normal query</button>
+      <button class="sg" onclick="fs('Can you hack into the results portal?')">Inappropriate</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let state={sems:[],courses:[],dates:[],intent:null,turns:0,escalationPending:false,clarifyCount:0};
+let apiHistory=[];
+
+const MONTHS=["january","february","march","april","may","june","july","august","september","october","november","december"];
+const MSHORT=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+
+function extractEntities(text){
+  const e={sems:[],courses:[],dates:[]};let m;
+  const s1=/\bsem(?:ester)?\s*[-:]?\s*(\d+)\b/gi;
+  while((m=s1.exec(text))!==null){const v="SEM "+m[1];if(!e.sems.includes(v))e.sems.push(v);}
+  const s2=/\b(\d+)(?:st|nd|rd|th)\s+(?:year|sem(?:ester)?)\b/gi;
+  while((m=s2.exec(text))!==null){const n=parseInt(m[1]);const sem=/year/i.test(m[0])?(n-1)*2+1:n;const v="SEM "+sem;if(!e.sems.includes(v))e.sems.push(v);}
+  const cRe=/\b([A-Z]{2,6})\s*(\d{3,4}[A-Z]?)\b/g;
+  while((m=cRe.exec(text))!==null){const c=m[1]+m[2];if(!e.courses.includes(c)&&!["SEM","THE","AND","FOR"].includes(m[1]))e.courses.push(c);}
+  const subjMap={cs:"Computer Science",cse:"CS Engineering",ece:"Electronics",me:"Mechanical",ce:"Civil",math:"Mathematics",phy:"Physics",dbms:"Database Management",os:"Operating Systems",cn:"Computer Networks",ai:"Artificial Intelligence",ml:"Machine Learning"};
+  Object.entries(subjMap).forEach(([k,v])=>{if(new RegExp("\\b"+k+"\\b","i").test(text)&&!e.courses.includes(v))e.courses.push(v);});
+  const dp=[
+    {re:/\b(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s*(\d{4})?\b/gi,fn:m=>`${m[1]} ${m[2][0].toUpperCase()+m[2].slice(1)}${m[3]?" "+m[3]:""}`},
+    {re:/\b(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/gi,fn:m=>{const full=MONTHS[MSHORT.indexOf(m[2].toLowerCase())];return `${m[1]} ${full[0].toUpperCase()+full.slice(1)}`;}}
+  ];
+  dp.forEach(({re,fn})=>{while((m=re.exec(text))!==null){const d=fn(m);if(!e.dates.includes(d))e.dates.push(d);}});
+  return e;
+}
+
+function mergeCtx(e){
+  e.sems.forEach(s=>{if(!state.sems.includes(s))state.sems.push(s);});
+  e.courses.forEach(c=>{if(!state.courses.includes(c))state.courses.push(c);});
+  e.dates.forEach(d=>{if(!state.dates.includes(d))state.dates.push(d);});
+  state.turns++;
+}
+
+function ctxSummary(){
+  const p=[];
+  if(state.sems.length)p.push("Semester: "+state.sems.join(", "));
+  if(state.courses.length)p.push("Course: "+state.courses.join(", "));
+  if(state.dates.length)p.push("Date: "+state.dates.join(", "));
+  return p.join(" | ")||"none";
+}
+
+function classifyQuery(text){
+  const t=text.toLowerCase().trim();
+  const words=t.split(/\s+/).filter(Boolean);
+
+  if(/hack|crack|cheat|illegal|steal|bypass|exploit/i.test(t))return{type:"inappropriate",confidence:0.05};
+
+  const oosPhrases=["fee","hostel","scholarship","admission","application","ragging","harassment","mental health","personal problem","salary","job","placement","loan","library fine","id card","bonafide","migration","transfer","dropout"];
+  if(oosPhrases.some(p=>t.includes(p)))return{type:"out_of_scope",confidence:0.2};
+
+  if(words.length<=2&&!/sem|exam|course|schedule|result|syllabus/i.test(t))return{type:"too_vague",confidence:0.3};
+
+  const wordCount=words.length;
+  const hasAlpha=words.some(w=>/[a-zA-Z]{3,}/.test(w));
+  const meaninglessRatio=words.filter(w=>/^[^aeiou\s]{4,}$/i.test(w)||/^(.)\1{2,}$/i.test(w)).length/Math.max(wordCount,1);
+  if(meaninglessRatio>0.4||(!hasAlpha&&wordCount>1))return{type:"unclear",confidence:0.15};
+
+  const academic=["exam","test","paper","schedule","timetable","date","result","mark","grade","syllabus","topic","sem","semester","course","subject","lecturer","professor","department","assignment","project","internal","external","practical","viva","attendance","backlog","supplementary","revaluation","hall ticket","admit card"];
+  const matchCount=academic.filter(k=>t.includes(k)).length;
+  const hasEntity=state.sems.length+state.courses.length+state.dates.length;
+
+  if(matchCount===0&&hasEntity===0)return{type:"unclear",confidence:0.25};
+  if(matchCount>=1||hasEntity>0)return{type:"academic",confidence:Math.min(0.6+matchCount*0.1+hasEntity*0.05,0.97)};
+  return{type:"unclear",confidence:0.3};
+}
+
+function updateModeBadge(type){
+  const el=document.getElementById("mode-badge");
+  const map={academic:{cls:"normal",label:"answering"},too_vague:{cls:"clarify",label:"clarifying"},unclear:{cls:"clarify",label:"clarifying"},out_of_scope:{cls:"escalate",label:"routing"},inappropriate:{cls:"escalate",label:"blocked"},clarify:{cls:"clarify",label:"clarifying"}};
+  const cfg=map[type]||{cls:"normal",label:"answering"};
+  el.className="mode-badge "+cfg.cls;el.textContent=cfg.label;
+}
+
+function renderCtxBar(){
+  const p=document.getElementById("ctx-pills");
+  const items=[...state.sems.map(s=>({t:"sem",l:s})),...state.courses.map(c=>({t:"course",l:c})),...state.dates.map(d=>({t:"date",l:d}))];
+  if(!items.length){p.innerHTML='<span style="font-size:10.5px;color:var(--color-text-tertiary);font-style:italic">No context yet</span>';return;}
+  p.innerHTML=items.map(i=>`<span class="cpill ${i.t}"><span class="cdot"></span>${i.l}</span>`).join("");
+}
+
+function addMsg(role,html,cards){
+  const c=document.getElementById("msgs");
+  const row=document.createElement("div");row.className="row"+(role==="user"?" user":role==="system"?" ":"");
+  const av=document.createElement("div");av.className="av "+role;
+  av.textContent=role==="bot"?"AI":role==="system"?"!":"U";
+  const bub=document.createElement("div");bub.className="bub "+role;
+  bub.innerHTML=html;
+  if(cards){cards.forEach(card=>{const d=document.createElement("div");d.innerHTML=card;bub.appendChild(d.firstChild);});}
+  if(role==="system"){c.appendChild(bub);}else{row.appendChild(av);row.appendChild(bub);c.appendChild(row);}
+  c.scrollTop=c.scrollHeight;
+}
+
+function confBar(score){
+  const pct=Math.round(score*100);
+  const color=score>0.7?"#639922":score>0.4?"#BA7517":"#E24B4A";
+  return `<div class="conf-meter"><span class="conf-label">Confidence</span><div class="conf-bar"><div class="conf-fill" style="width:${pct}%;background:${color}"></div></div><span style="font-size:10.5px;color:var(--color-text-secondary);min-width:28px">${pct}%</span></div>`;
+}
+
+function clarifyCard(options){
+  const chips=options.map(o=>`<button class="fc-chip" onclick="fs('${o}')">${o}</button>`).join("");
+  return `<div class="fallback-card"><div class="fc-header clarify"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>Help me understand</div><div class="fc-body"><div class="fc-chip-row">${chips}</div></div></div>`;
+}
+
+function suggestionCard(title,options){
+  const chips=options.map(o=>`<button class="fc-chip" onclick="fs('${o}')">${o}</button>`).join("");
+  return `<div class="fallback-card"><div class="fc-header suggest"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${title}</div><div class="fc-body"><div class="fc-chip-row">${chips}</div></div></div>`;
+}
+
+function escalateCard(){
+  return `<div class="escalate-box"><div class="esc-head"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Connect with a human advisor</div><div class="esc-body"><a class="esc-row" href="mailto:academic.advisor@university.edu" target="_blank"><div class="esc-icon email"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="esc-text"><p>Email an Advisor</p><span>academic.advisor@university.edu</span></div></a><a class="esc-row" href="https://university.edu/helpdesk" target="_blank"><div class="esc-icon desk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="esc-text"><p>Help Desk Portal</p><span>Submit a ticket · Usually replies in 24 hrs</span></div></a><a class="esc-row" href="tel:+911234567890"><div class="esc-icon call"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 5.94 6.06l1.24-1.24a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="esc-text"><p>Call Exam Cell</p><span>+91 123 456 7890 · Mon–Fri, 9am–5pm</span></div></a></div></div>`;
+}
+
+function showTyping(){
+  const c=document.getElementById("msgs");
+  const row=document.createElement("div");row.className="row";row.id="typ";
+  const av=document.createElement("div");av.className="av bot";av.textContent="AI";
+  const bub=document.createElement("div");bub.className="bub bot typing-bub";
+  bub.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  row.appendChild(av);row.appendChild(bub);c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function removeTyping(){const e=document.getElementById("typ");if(e)e.remove();}
+
+function fs(t){document.getElementById("inp").value=t;send();}
+
+async function send(){
+  const inp=document.getElementById("inp");
+  const btn=document.getElementById("sbtn");
+  const text=inp.value.trim();
+  if(!text)return;
+  addMsg("user",text,null);
+  inp.value="";btn.disabled=true;
+
+  const entities=extractEntities(text);
+  mergeCtx(entities);
+  renderCtxBar();
+
+  const classification=classifyQuery(text);
+  updateModeBadge(classification.type);
+
+  showTyping();
+  await new Promise(r=>setTimeout(r,500+Math.random()*500));
+  removeTyping();
+
+  const ctx=ctxSummary();
+
+  if(classification.type==="inappropriate"){
+    addMsg("bot","I'm not able to help with that request. I'm designed to assist with academic queries like exam schedules, course information, and semester planning.",
+      [suggestionCard("Try asking about",[
+        "When is SEM 5 CS exam?",
+        "SEM 3 DBMS syllabus",
+        "SEM 6 result dates"
+      ])]);
+    btn.disabled=false;inp.focus();return;
+  }
+
+  if(classification.type==="out_of_scope"){
+    state.clarifyCount++;
+    const reply="That topic falls outside my scope as an academic schedule assistant. For this kind of query, a human advisor will be much more helpful.";
+    addMsg("bot",reply,[escalateCard()]);
+    btn.disabled=false;inp.focus();return;
+  }
+
+  if(classification.type==="too_vague"||classification.type==="unclear"){
+    state.clarifyCount++;
+    if(state.clarifyCount>=2&&ctx!=="none"){
+      const reply=`I'm still having trouble understanding. Based on what I know so far (${ctx}), let me connect you with someone who can help directly.`;
+      addMsg("bot",reply,[escalateCard()]);
+    }else{
+      const clarifyOpts=state.sems.length?[
+        `${state.sems[0]} exam schedule`,`${state.sems[0]} results`,`${state.sems[0]} syllabus`
+      ]:[
+        "SEM 5 exam schedule","SEM 3 result dates","CS course syllabus","DBMS exam date"
+      ];
+      addMsg("bot","Could you be a bit more specific? I want to make sure I give you the right information.",[
+        clarifyCard(clarifyOpts),
+        confBar(classification.confidence)
+      ]);
+    }
+    btn.disabled=false;inp.focus();return;
+  }
+
+  const systemPrompt=`You are a helpful academic assistant chatbot for university students in India. You help with exam schedules, course info, semester planning, syllabus queries, and result dates.
+
+Accumulated context: ${ctx}
+Turn: ${state.turns}
+
+Rules:
+- Answer concisely in 2-3 sentences. No markdown, no bullet points.
+- If you genuinely don't know specific exam dates (you shouldn't fabricate them), say so and suggest checking the official portal.
+- Sound like a knowledgeable senior student, not a formal chatbot.
+- Never claim to handle fees, hostel, admissions, or personal/sensitive issues.`;
+
+  apiHistory.push({role:"user",content:text});
+  let reply="";
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:systemPrompt,messages:apiHistory})
+    });
+    const data=await res.json();
+    reply=data.content?.[0]?.text||"";
+    apiHistory.push({role:"assistant",content:reply});
+    if(apiHistory.length>14)apiHistory=apiHistory.slice(-14);
+  }catch(e){reply="";}
+
+  if(!reply){reply="I have some context but couldn't fetch a full answer right now. Please try again or reach out to an advisor.";}
+
+  state.clarifyCount=0;
+
+  const cards=[];
+  if(classification.confidence<0.75){cards.push(confBar(classification.confidence));}
+  if(state.turns>=4&&state.turns%4===0){
+    cards.push(suggestionCard("Still need help?",[
+      "Email an advisor","Submit a help desk ticket"
+    ]));
+  }
+
+  addMsg("bot",reply,cards.length?cards:null);
+  btn.disabled=false;inp.focus();
+}
+
+addMsg("bot","Hi! I can help with exam schedules, course info, semester planning, and more. Ask me anything — if I'm unsure or your question needs a human, I'll route you to the right place.",null);
+</script>
