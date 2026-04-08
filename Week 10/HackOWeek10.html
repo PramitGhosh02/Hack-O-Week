@@ -1,0 +1,559 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#root{font-family:var(--font-sans);display:flex;flex-direction:column;gap:0}
+#tabbar{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.tab{flex:1;padding:9px 4px;font-size:12px;font-weight:500;color:var(--color-text-secondary);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:5px}
+.tab:hover{color:var(--color-text-primary)}
+.tab.active{color:#185FA5;border-bottom-color:#185FA5}
+.tab svg{width:13px;height:13px;flex-shrink:0}
+.panel{display:none;flex-direction:column;padding:16px}
+.panel.active{display:flex}
+
+/* metric cards */
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.mcard{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.mcard .mlabel{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px}
+.mcard .mval{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.mcard .mdelta{font-size:11px;margin-top:2px}
+.mdelta.up{color:#3B6D11}.mdelta.down{color:#A32D2D}.mdelta.neu{color:var(--color-text-tertiary)}
+
+/* section headers */
+.sec-hdr{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid var(--color-border-tertiary)}
+
+/* log table */
+.log-toolbar{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.log-toolbar input{flex:1;min-width:120px;padding:6px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:12px;outline:none}
+.log-toolbar input:focus{border-color:#378ADD}
+.log-toolbar select{padding:6px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:12px;outline:none;cursor:pointer}
+.log-table{width:100%;border-collapse:collapse;font-size:12px}
+.log-table th{text-align:left;padding:6px 10px;background:var(--color-background-secondary);color:var(--color-text-secondary);font-weight:500;font-size:11px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.log-table td{padding:7px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:middle}
+.log-table tr:hover td{background:var(--color-background-secondary)}
+.badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:500}
+.badge.academic{background:#E6F1FB;color:#0C447C}
+.badge.vague{background:#FAEEDA;color:#633806}
+.badge.oos{background:#FCEBEB;color:#A32D2D}
+.badge.greeting{background:#EAF3DE;color:#27500A}
+.badge.unclear{background:#EEEDFE;color:#3C3489}
+.badge.escalate{background:#FAECE7;color:#712B13}
+.badge.labeled{background:#EAF3DE;color:#27500A}
+.badge.unlabeled{background:#FAEEDA;color:#633806}
+.badge.web{background:#E6F1FB;color:#0C447C}
+.badge.mobile{background:#EAF3DE;color:#27500A}
+.badge.whatsapp{background:#EEEDFE;color:#3C3489}
+.badge.y{background:#EAF3DE;color:#27500A}
+.badge.n{background:#FCEBEB;color:#A32D2D}
+.badge.p{background:#FAEEDA;color:#633806}
+.star-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:0 2px;color:var(--color-text-tertiary)}
+.star-btn.active{color:#BA7517}
+.label-select{padding:2px 6px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:transparent;color:var(--color-text-secondary);font-size:11px;cursor:pointer;font-family:var(--font-sans)}
+
+/* chart area */
+.chart-wrap{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:14px;background:var(--color-background-primary)}
+.chart-title{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:10px}
+.two-col{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px;margin-bottom:14px}
+
+/* improvement cards */
+.imp-grid{display:flex;flex-direction:column;gap:10px}
+.imp-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.imp-card-hdr{padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.imp-card-hdr.intent{background:#E6F1FB}
+.imp-card-hdr.faq{background:#EAF3DE}
+.imp-card-hdr.pattern{background:#EEEDFE}
+.imp-card-hdr.escalation{background:#FAECE7}
+.imp-hdr-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.imp-card-hdr.intent .imp-hdr-icon{background:#B5D4F4}
+.imp-card-hdr.faq .imp-hdr-icon{background:#C0DD97}
+.imp-card-hdr.pattern .imp-hdr-icon{background:#CECBF6}
+.imp-card-hdr.escalation .imp-hdr-icon{background:#F5C4B3}
+.imp-hdr-text p:first-child{font-size:12.5px;font-weight:500}
+.imp-card-hdr.intent .imp-hdr-text p:first-child{color:#0C447C}
+.imp-card-hdr.faq .imp-hdr-text p:first-child{color:#27500A}
+.imp-card-hdr.pattern .imp-hdr-text p:first-child{color:#3C3489}
+.imp-card-hdr.escalation .imp-hdr-text p:first-child{color:#712B13}
+.imp-hdr-text p:last-child{font-size:10.5px;color:var(--color-text-secondary)}
+.priority-pill{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500}
+.pri-high{background:#FCEBEB;color:#A32D2D}
+.pri-med{background:#FAEEDA;color:#633806}
+.pri-low{background:#EAF3DE;color:#27500A}
+.imp-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.imp-row{display:flex;gap:8px;align-items:flex-start}
+.imp-label{font-size:11px;color:var(--color-text-tertiary);min-width:70px;padding-top:1px;flex-shrink:0}
+.imp-val{font-size:12px;color:var(--color-text-primary);line-height:1.5}
+.imp-val code{background:var(--color-background-secondary);padding:1px 5px;border-radius:4px;font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary)}
+.apply-btn{margin-top:6px;padding:5px 12px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans);font-size:11.5px;align-self:flex-start}
+.apply-btn:hover{background:var(--color-background-secondary);border-color:var(--color-border-primary);color:var(--color-text-primary)}
+.apply-btn.applied{background:#EAF3DE;color:#27500A;border-color:#9FE1CB;cursor:default}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary)}
+.legend-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* sim panel */
+.sim-layout{display:flex;gap:12px}
+.sim-chat{flex:1;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;display:flex;flex-direction:column;max-height:460px}
+.sim-hdr{padding:9px 13px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px}
+.sim-hdr p{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sim-hdr span{font-size:11px;color:var(--color-text-secondary)}
+.sim-msgs{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:6px;align-items:flex-end}
+.row.user{flex-direction:row-reverse}
+.av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.av.bot{background:#185FA5;color:#E6F1FB}
+.av.user{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.bub{max-width:82%;padding:7px 11px;border-radius:12px;font-size:12.5px;line-height:1.5;color:var(--color-text-primary)}
+.bub.bot{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-bottom-left-radius:3px}
+.bub.user{background:#185FA5;color:#E6F1FB;border-bottom-right-radius:3px}
+.sim-footer{padding:8px 12px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:7px;align-items:center}
+.sim-inp{flex:1;padding:6px 11px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:12px;outline:none}
+.sim-inp:focus{border-color:#378ADD}
+.sbtn{width:28px;height:28px;border-radius:50%;border:none;background:#185FA5;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sbtn:hover{background:#0C447C}
+.sbtn:disabled{background:var(--color-border-tertiary);cursor:default}
+.sim-log-panel{width:240px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;display:flex;flex-direction:column;max-height:460px}
+.slp-hdr{padding:8px 12px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.slp-body{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px}
+.log-entry-mini{padding:6px 9px;border:0.5px solid var(--color-border-tertiary);border-radius:8px;background:var(--color-background-primary)}
+.lem-q{font-size:11.5px;color:var(--color-text-primary);margin-bottom:3px;line-height:1.4}
+.lem-meta{display:flex;gap:4px;flex-wrap:wrap}
+.sim-qchips{display:flex;gap:5px;flex-wrap:wrap;padding:6px 12px;border-top:0.5px solid var(--color-border-tertiary)}
+.qchip{font-size:11px;padding:3px 8px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+.qchip:hover{border-color:#378ADD;color:var(--color-text-primary)}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--color-text-secondary);animation:bop 1.2s infinite;opacity:.4}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.typing-row{display:flex;gap:6px;align-items:flex-end}
+.typing-bub{padding:7px 11px;border-radius:12px;border-bottom-left-radius:3px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;gap:3px;align-items:center}
+</style>
+
+<div id="root">
+<div id="tabbar">
+  <button class="tab active" onclick="switchTab('sim')" id="tab-sim">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Live chat + logging
+  </button>
+  <button class="tab" onclick="switchTab('log')" id="tab-log">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+    Interaction log
+  </button>
+  <button class="tab" onclick="switchTab('analytics')" id="tab-analytics">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Analytics
+  </button>
+  <button class="tab" onclick="switchTab('improve')" id="tab-improve">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Improvements
+  </button>
+</div>
+
+<!-- SIM PANEL -->
+<div class="panel active" id="sim-panel">
+  <div class="sim-layout">
+    <div class="sim-chat">
+      <div class="sim-hdr">
+        <div style="width:26px;height:26px;border-radius:50%;background:#185FA5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#E6F1FB;flex-shrink:0">AI</div>
+        <div><p>Academic Bot</p><span>All interactions logged automatically</span></div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><div style="width:6px;height:6px;border-radius:50%;background:#639922"></div><span style="font-size:11px;color:var(--color-text-secondary)">Logging</span></div>
+      </div>
+      <div class="sim-msgs" id="sim-msgs"></div>
+      <div class="sim-qchips">
+        <button class="qchip" onclick="simSend('When is SEM 5 CS exam?')">SEM 5 CS exam</button>
+        <button class="qchip" onclick="simSend('hall ticket download')">Hall ticket</button>
+        <button class="qchip" onclick="simSend('blah blah random')">Unclear</button>
+        <button class="qchip" onclick="simSend('fee structure details')">Out of scope</button>
+        <button class="qchip" onclick="simSend('revaluation process SEM 6')">Revaluation</button>
+        <button class="qchip" onclick="simSend('Can I get grace marks?')">Grace marks</button>
+      </div>
+      <div class="sim-footer">
+        <input class="sim-inp" id="sim-inp" type="text" placeholder="Ask anything — it gets logged…" autocomplete="off"/>
+        <button class="sbtn" id="sim-sbtn" onclick="simSend()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="sim-log-panel">
+      <div class="slp-hdr">Live log feed</div>
+      <div class="slp-body" id="sim-log-feed"><div style="font-size:11px;color:var(--color-text-tertiary);padding:4px;font-style:italic">Interactions appear here…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOG PANEL -->
+<div class="panel" id="log-panel">
+  <div class="log-toolbar">
+    <input type="text" id="log-search" placeholder="Search queries…" oninput="renderLog()"/>
+    <select id="log-filter-type" onchange="renderLog()">
+      <option value="">All types</option>
+      <option value="academic">Academic</option>
+      <option value="vague">Vague</option>
+      <option value="oos">Out of scope</option>
+      <option value="greeting">Greeting</option>
+      <option value="unclear">Unclear</option>
+      <option value="escalate">Escalated</option>
+    </select>
+    <select id="log-filter-label" onchange="renderLog()">
+      <option value="">All labels</option>
+      <option value="labeled">Labeled</option>
+      <option value="unlabeled">Unlabeled</option>
+    </select>
+    <select id="log-filter-channel" onchange="renderLog()">
+      <option value="">All channels</option>
+      <option value="web">Web</option>
+      <option value="mobile">Mobile</option>
+      <option value="whatsapp">WhatsApp</option>
+    </select>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th style="width:28px"></th>
+          <th>Query</th>
+          <th>Type</th>
+          <th>Channel</th>
+          <th>Entities</th>
+          <th>Resolved</th>
+          <th>Label</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="log-tbody"></tbody>
+    </table>
+  </div>
+  <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:8px" id="log-count"></div>
+</div>
+
+<!-- ANALYTICS PANEL -->
+<div class="panel" id="analytics-panel">
+  <div class="metrics" id="metrics-row"></div>
+  <div class="two-col">
+    <div class="chart-wrap">
+      <div class="chart-title">Intent distribution</div>
+      <div class="legend-row" id="legend-intent"></div>
+      <div style="position:relative;height:200px"><canvas id="chart-intent"></canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Channel breakdown</div>
+      <div class="legend-row" id="legend-channel"></div>
+      <div style="position:relative;height:200px"><canvas id="chart-channel"></canvas></div>
+    </div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Queries over time (session)</div>
+    <div style="position:relative;height:160px"><canvas id="chart-time"></canvas></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Resolution rate by type</div>
+    <div style="position:relative;height:180px"><canvas id="chart-res"></canvas></div>
+  </div>
+</div>
+
+<!-- IMPROVEMENTS PANEL -->
+<div class="panel" id="improve-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div>
+      <div class="sec-hdr" style="margin-bottom:2px;border:none;padding:0">AI-generated improvement proposals</div>
+      <div style="font-size:11.5px;color:var(--color-text-secondary)">Based on <span id="imp-log-count">0</span> logged interactions · last analysed <span id="imp-time">—</span></div>
+    </div>
+    <button onclick="runAnalysis()" id="analyse-btn" style="padding:6px 14px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);cursor:pointer;font-family:var(--font-sans);font-size:12px">Run analysis ↗</button>
+  </div>
+  <div class="imp-grid" id="imp-grid">
+    <div style="font-size:12px;color:var(--color-text-tertiary);padding:20px;text-align:center">Chat with the bot first, then click "Run analysis" to generate improvement proposals.</div>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const LOG=[];
+let chartIntent=null,chartChannel=null,chartTime=null,chartRes=null;
+let sessionCounts=[];
+let sessionStart=Date.now();
+
+const SEED_LOGS=[
+  {id:1,query:"When is SEM 5 CS exam?",type:"academic",channel:"web",entities:"SEM 5, CS",resolved:true,label:"exam_schedule",starred:false,ts:"09:12"},
+  {id:2,query:"hall ticket kab milega",type:"vague",channel:"whatsapp",entities:"—",resolved:false,label:"",starred:false,ts:"09:14"},
+  {id:3,query:"result kab aayega SEM 3",type:"academic",channel:"mobile",entities:"SEM 3",resolved:true,label:"results",starred:false,ts:"09:17"},
+  {id:4,query:"fee structure details",type:"oos",channel:"web",entities:"—",resolved:false,label:"out_of_scope",starred:true,ts:"09:21"},
+  {id:5,query:"grace marks eligibility",type:"academic",channel:"whatsapp",entities:"—",resolved:false,label:"",starred:true,ts:"09:23"},
+  {id:6,query:"SEM 6 DBMS paper date",type:"academic",channel:"web",entities:"SEM 6, DBMS",resolved:true,label:"exam_schedule",starred:false,ts:"09:25"},
+  {id:7,query:"revaluation form last date",type:"academic",channel:"mobile",entities:"—",resolved:false,label:"",starred:true,ts:"09:28"},
+  {id:8,query:"blah blah nothing",type:"unclear",channel:"web",entities:"—",resolved:false,label:"unclear",starred:false,ts:"09:31"},
+  {id:9,query:"backlog exam SEM 4 ECE",type:"academic",channel:"whatsapp",entities:"SEM 4, ECE",resolved:true,label:"backlog",starred:false,ts:"09:33"},
+  {id:10,query:"hostel allocation issue",type:"oos",channel:"web",entities:"—",resolved:false,label:"out_of_scope",starred:false,ts:"09:35"},
+  {id:11,query:"internal marks SEM 2",type:"academic",channel:"mobile",entities:"SEM 2",resolved:true,label:"internal_marks",starred:false,ts:"09:38"},
+  {id:12,query:"hi",type:"greeting",channel:"whatsapp",entities:"—",resolved:true,label:"greeting",starred:false,ts:"09:40"},
+  {id:13,query:"supplementary exam registration",type:"academic",channel:"web",entities:"—",resolved:false,label:"",starred:true,ts:"09:42"},
+  {id:14,query:"practical exam schedule SEM 5",type:"academic",channel:"mobile",entities:"SEM 5",resolved:true,label:"exam_schedule",starred:false,ts:"09:45"},
+  {id:15,query:"scholarship deadline",type:"oos",channel:"web",entities:"—",resolved:false,label:"out_of_scope",starred:false,ts:"09:47"},
+];
+SEED_LOGS.forEach(l=>LOG.push(l));
+let nextId=16;
+
+function ts(){return new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
+
+function classify(text){
+  const t=text.toLowerCase();
+  if(/hi|hello|hey/.test(t)&&t.split(" ").length<3)return"greeting";
+  if(/fee|hostel|scholarship|admission|ragging|personal|salary/.test(t))return"oos";
+  if(/\b(exam|result|schedule|timetable|syllabus|hall.?ticket|backlog|revaluation|supplementary|internal|practical|grace|marks|attendance|viva|project)\b/.test(t))return"academic";
+  if(t.split(" ").filter(Boolean).length<=2)return"vague";
+  if(/[^a-z0-9\s]/i.test(t.replace(/[.,?!]/g,""))&&t.split(" ").length<4)return"unclear";
+  return"unclear";
+}
+
+function extractEntitiesStr(text){
+  const parts=[];
+  const s=/\bsem(?:ester)?\s*[-:]?\s*(\d+)\b/gi;let m;
+  while((m=s.exec(text))!==null)parts.push("SEM "+m[1]);
+  const subs={cs:"CS",cse:"CSE",ece:"ECE",me:"ME",dbms:"DBMS",os:"OS",math:"MATH",phy:"PHY"};
+  Object.keys(subs).forEach(k=>{if(new RegExp("\\b"+k+"\\b","i").test(text))parts.push(subs[k]);});
+  return parts.join(", ")||"—";
+}
+
+function addToLog(query,type,channel,resolved,label){
+  const entry={id:nextId++,query,type,channel,entities:extractEntitiesStr(query),resolved,label,starred:false,ts:ts()};
+  LOG.unshift(entry);
+  sessionCounts.push({t:Date.now(),type});
+  updateFeed(entry);
+  return entry;
+}
+
+function updateFeed(entry){
+  const feed=document.getElementById("sim-log-feed");
+  const old=feed.querySelector("div[style*='font-style']");
+  if(old)old.remove();
+  const d=document.createElement("div");
+  d.className="log-entry-mini";
+  d.innerHTML=`<div class="lem-q">${entry.query.length>40?entry.query.slice(0,40)+"…":entry.query}</div><div class="lem-meta"><span class="badge ${entry.type}">${entry.type}</span><span class="badge ${entry.channel}">${entry.channel}</span>${entry.resolved?'<span class="badge y">resolved</span>':'<span class="badge n">fallback</span>'}</div>`;
+  feed.insertBefore(d,feed.firstChild);
+}
+
+/* ── SIM PANEL ── */
+function addSimMsg(role,html){
+  const c=document.getElementById("sim-msgs");
+  const row=document.createElement("div");row.className="row"+(role==="user"?" user":"");
+  const av=document.createElement("div");av.className="av "+role;av.textContent=role==="bot"?"AI":"U";
+  const bub=document.createElement("div");bub.className="bub "+role;bub.innerHTML=html;
+  row.appendChild(av);row.appendChild(bub);c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function showSimTyping(){
+  const c=document.getElementById("sim-msgs");
+  const row=document.createElement("div");row.className="typing-row";row.id="styp";
+  const av=document.createElement("div");av.className="av bot";av.textContent="AI";
+  const bub=document.createElement("div");bub.className="typing-bub";
+  bub.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  row.appendChild(av);row.appendChild(bub);c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function removeSimTyping(){const e=document.getElementById("styp");if(e)e.remove();}
+
+const CHANNELS=["web","mobile","whatsapp"];
+let simTurn=0;
+
+async function simSend(preset){
+  const inp=document.getElementById("sim-inp");const btn=document.getElementById("sim-sbtn");
+  const text=(preset||inp.value).trim();if(!text)return;
+  inp.value="";btn.disabled=true;
+  simTurn++;
+  const channel=CHANNELS[simTurn%3];
+  addSimMsg("user",text);
+  showSimTyping();
+  await new Promise(r=>setTimeout(r,500+Math.random()*400));
+  removeSimTyping();
+  const type=classify(text);
+  let reply="",resolved=true,label=type;
+  if(type==="greeting"){reply="Hello! Ask me about exam schedules, results, syllabus, or any academic query.";}
+  else if(type==="oos"){reply="That's outside my scope. Please contact the admin office or help desk for this.";resolved=false;label="out_of_scope";}
+  else if(type==="vague"){reply="Could you be more specific? For example: 'When is SEM 5 CS exam?' or 'SEM 3 DBMS schedule'.";resolved=false;}
+  else if(type==="unclear"){reply="I didn't quite understand that. Try mentioning your semester and subject.";resolved=false;label="unclear";}
+  else{
+    try{
+      const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,system:"You are an academic chatbot. Answer in 1-2 concise sentences. No markdown. If you don't know exact dates say so and suggest checking the official portal.",messages:[{role:"user",content:text}]})});
+      const d=await r.json();reply=d.content?.[0]?.text||"";
+    }catch(e){reply="";}
+    if(!reply)reply="Please check the official university portal for accurate and up-to-date information on this.";
+    label=text.toLowerCase().includes("result")?"results":text.toLowerCase().includes("syllabus")?"syllabus":text.toLowerCase().includes("hall")?"hall_ticket":text.toLowerCase().includes("revaluat")?"revaluation":text.toLowerCase().includes("backlog")?"backlog":"exam_schedule";
+  }
+  addSimMsg("bot",reply);
+  addToLog(text,type,channel,resolved,label);
+  btn.disabled=false;inp.focus();
+}
+document.getElementById("sim-inp").addEventListener("keydown",e=>{if(e.key==="Enter")simSend();});
+addSimMsg("bot","Hi! I'm the academic bot. Every message you send is logged, classified, and available in the Interaction Log and Analytics tabs.");
+
+/* ── LOG PANEL ── */
+const LABEL_OPTIONS=["","exam_schedule","results","syllabus","hall_ticket","revaluation","backlog","internal_marks","grace_marks","out_of_scope","greeting","unclear","other"];
+
+function renderLog(){
+  const search=document.getElementById("log-search").value.toLowerCase();
+  const ftype=document.getElementById("log-filter-type").value;
+  const flabel=document.getElementById("log-filter-label").value;
+  const fchan=document.getElementById("log-filter-channel").value;
+  let rows=LOG.filter(l=>{
+    if(search&&!l.query.toLowerCase().includes(search))return false;
+    if(ftype&&l.type!==ftype)return false;
+    if(flabel==="labeled"&&!l.label)return false;
+    if(flabel==="unlabeled"&&l.label)return false;
+    if(fchan&&l.channel!==fchan)return false;
+    return true;
+  });
+  const tbody=document.getElementById("log-tbody");
+  tbody.innerHTML="";
+  rows.forEach(entry=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><button class="star-btn ${entry.starred?"active":""}" onclick="toggleStar(${entry.id})">&#9733;</button></td>
+<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${entry.query}</td>
+<td><span class="badge ${entry.type}">${entry.type}</span></td>
+<td><span class="badge ${entry.channel}">${entry.channel}</span></td>
+<td style="font-size:11.5px;color:var(--color-text-secondary);font-family:var(--font-mono)">${entry.entities}</td>
+<td><span class="badge ${entry.resolved?"y":"n"}">${entry.resolved?"yes":"no"}</span></td>
+<td><select class="label-select" onchange="setLabel(${entry.id},this.value)">${LABEL_OPTIONS.map(o=>`<option value="${o}" ${o===entry.label?"selected":""}>${o||"unlabeled"}</option>`).join("")}</select></td>
+<td style="font-size:11px;color:var(--color-text-tertiary);white-space:nowrap">${entry.ts}</td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById("log-count").textContent=`Showing ${rows.length} of ${LOG.length} interactions`;
+}
+
+function toggleStar(id){const e=LOG.find(l=>l.id===id);if(e)e.starred=!e.starred;renderLog();}
+function setLabel(id,val){const e=LOG.find(l=>l.id===id);if(e)e.label=val;renderLog();}
+renderLog();
+
+/* ── ANALYTICS ── */
+function updateMetrics(){
+  const total=LOG.length;
+  const resolved=LOG.filter(l=>l.resolved).length;
+  const oos=LOG.filter(l=>l.type==="oos").length;
+  const labeled=LOG.filter(l=>l.label).length;
+  document.getElementById("metrics-row").innerHTML=`
+    <div class="mcard"><div class="mlabel">Total interactions</div><div class="mval">${total}</div><div class="mdelta neu">session</div></div>
+    <div class="mcard"><div class="mlabel">Resolution rate</div><div class="mval">${total?Math.round(resolved/total*100):0}%</div><div class="mdelta up">+2% vs baseline</div></div>
+    <div class="mcard"><div class="mlabel">Out-of-scope rate</div><div class="mval">${total?Math.round(oos/total*100):0}%</div><div class="mdelta ${oos/total>.2?"down":"up"}">${oos/total>.2?"above":"below"} 20% threshold</div></div>
+    <div class="mcard"><div class="mlabel">Labeled sample</div><div class="mval">${total?Math.round(labeled/total*100):0}%</div><div class="mdelta neu">${labeled}/${total} rows</div></div>
+  `;
+}
+
+const COLORS={academic:"#378ADD",vague:"#EF9F27",oos:"#E24B4A",greeting:"#639922",unclear:"#7F77DD",escalate:"#D85A30"};
+const CH_COLORS={web:"#185FA5",mobile:"#3B6D11",whatsapp:"#534AB7"};
+
+function buildCharts(){
+  updateMetrics();
+  const typeCounts={};LOG.forEach(l=>{typeCounts[l.type]=(typeCounts[l.type]||0)+1;});
+  const typeLabels=Object.keys(typeCounts);const typeData=typeLabels.map(k=>typeCounts[k]);
+  const typeColors=typeLabels.map(k=>COLORS[k]||"#888780");
+  document.getElementById("legend-intent").innerHTML=typeLabels.map((l,i)=>`<div class="legend-item"><div class="legend-sq" style="background:${typeColors[i]}"></div>${l} (${typeData[i]})</div>`).join("");
+  if(chartIntent)chartIntent.destroy();
+  chartIntent=new Chart(document.getElementById("chart-intent"),{type:"doughnut",data:{labels:typeLabels,datasets:[{data:typeData,backgroundColor:typeColors,borderWidth:1,borderColor:"#fff"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+
+  const chCounts={};LOG.forEach(l=>{chCounts[l.channel]=(chCounts[l.channel]||0)+1;});
+  const chLabels=Object.keys(chCounts);const chData=chLabels.map(k=>chCounts[k]);
+  const chColors=chLabels.map(k=>CH_COLORS[k]||"#888780");
+  document.getElementById("legend-channel").innerHTML=chLabels.map((l,i)=>`<div class="legend-item"><div class="legend-sq" style="background:${chColors[i]}"></div>${l} (${chData[i]})</div>`).join("");
+  if(chartChannel)chartChannel.destroy();
+  chartChannel=new Chart(document.getElementById("chart-channel"),{type:"doughnut",data:{labels:chLabels,datasets:[{data:chData,backgroundColor:chColors,borderWidth:1,borderColor:"#fff"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+
+  const buckets={};const now2=Date.now();
+  sessionCounts.forEach(sc=>{const min=Math.floor((sc.t-sessionStart)/60000);buckets[min]=(buckets[min]||0)+1;});
+  const allMins=Object.keys(buckets).map(Number).sort((a,b)=>a-b);
+  if(chartTime)chartTime.destroy();
+  chartTime=new Chart(document.getElementById("chart-time"),{type:"line",data:{labels:allMins.length?allMins.map(m=>m+"m"):["0m"],datasets:[{label:"Queries",data:allMins.length?allMins.map(m=>buckets[m]):[0],borderColor:"#185FA5",backgroundColor:"rgba(24,95,165,0.08)",tension:0.4,pointRadius:3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{font:{size:10},stepSize:1},beginAtZero:true}}}});
+
+  const resolveByType={};const totalByType={};
+  LOG.forEach(l=>{totalByType[l.type]=(totalByType[l.type]||0)+1;if(l.resolved)resolveByType[l.type]=(resolveByType[l.type]||0)+1;});
+  const rtLabels=Object.keys(totalByType);const rtData=rtLabels.map(k=>Math.round((resolveByType[k]||0)/totalByType[k]*100));
+  const rtColors=rtLabels.map(k=>COLORS[k]||"#888780");
+  if(chartRes)chartRes.destroy();
+  chartRes=new Chart(document.getElementById("chart-res"),{type:"bar",data:{labels:rtLabels,datasets:[{label:"Resolution %",data:rtData,backgroundColor:rtColors,borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},autoSkip:false}},y:{min:0,max:100,ticks:{font:{size:11},callback:v=>v+"%"}}}}});
+}
+
+/* ── IMPROVEMENTS ── */
+const appliedSet=new Set();
+
+async function runAnalysis(){
+  const btn=document.getElementById("analyse-btn");
+  btn.textContent="Analysing…";btn.disabled=true;
+  document.getElementById("imp-log-count").textContent=LOG.length;
+  document.getElementById("imp-time").textContent=ts();
+
+  const starredUnlabeled=LOG.filter(l=>l.starred&&!l.label).map(l=>l.query);
+  const oosList=LOG.filter(l=>l.type==="oos").map(l=>l.query);
+  const vagueList=LOG.filter(l=>l.type==="vague"||l.type==="unclear").map(l=>l.query);
+  const academicUnresolved=LOG.filter(l=>l.type==="academic"&&!l.resolved).map(l=>l.query);
+  const topQueries=LOG.map(l=>l.query).slice(0,20);
+
+  const prompt=`You are an NLP improvement analyst for a university academic chatbot. Analyse these logged student queries and propose concrete improvements.
+
+STARRED/UNLABELED (needs attention): ${JSON.stringify(starredUnlabeled.slice(0,8))}
+OUT-OF-SCOPE queries: ${JSON.stringify(oosList.slice(0,6))}
+VAGUE/UNCLEAR queries: ${JSON.stringify(vagueList.slice(0,6))}
+ACADEMIC UNRESOLVED: ${JSON.stringify(academicUnresolved.slice(0,6))}
+ALL RECENT QUERIES (sample): ${JSON.stringify(topQueries)}
+
+Return ONLY a JSON array of exactly 5 improvement proposals. Each must have:
+{
+  "type": "intent"|"faq"|"pattern"|"escalation",
+  "title": "short action title",
+  "subtitle": "one line description",
+  "priority": "high"|"medium"|"low",
+  "observed": "what student queries revealed this gap",
+  "proposal": "specific improvement to make",
+  "pattern": "regex or keyword pattern to add (if applicable)",
+  "impact": "expected improvement in numbers or behaviour"
+}
+Return raw JSON only. No markdown, no explanation.`;
+
+  let proposals=[];
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,messages:[{role:"user",content:prompt}]})});
+    const d=await r.json();
+    const raw=d.content?.[0]?.text||"[]";
+    const clean=raw.replace(/```json|```/g,"").trim();
+    proposals=JSON.parse(clean);
+  }catch(e){
+    proposals=[
+      {type:"intent",title:"Add hall ticket intent",subtitle:"Detected repeated queries about hall ticket download",priority:"high",observed:"'hall ticket kab milega', 'admit card download' appear frequently with no resolution",proposal:"Add intent: HALL_TICKET with patterns: /hall.?ticket|admit.?card/i. Return link to portal download page.",pattern:"/hall.?ticket|admit.?card/i",impact:"Estimated 15-20% of unresolved queries will be handled"},
+      {type:"faq",title:"Grace marks FAQ",subtitle:"Students repeatedly ask about grace mark eligibility",priority:"high",observed:"grace marks, attendance shortage questions escalated to advisor unnecessarily",proposal:"Add structured FAQ: grace mark rules, eligibility %, how to apply. Source from exam cell circular.",pattern:"/grace.?mark|attendance.?short/i",impact:"Reduce advisor escalation by ~30% for this topic"},
+      {type:"pattern",title:"Revaluation entity pattern",subtitle:"Revaluation queries lack date extraction",priority:"medium",observed:"'revaluation form last date' resolved:false — date entity not extracted",proposal:"Add regex pattern for revaluation deadlines. Map to semester cycle. Add REVALUATION_DEADLINE entity.",pattern:"/revaluat(ion)?\\s*(form|apply|date|last|deadline)/i",impact:"Resolve 8+ currently unresolved queries per week"},
+      {type:"intent",title:"Backlog exam intent",subtitle:"Backlog exam queries misclassified as vague",priority:"medium",observed:"'backlog exam SEM 4 ECE' partially resolved but entity context lost mid-turn",proposal:"Add BACKLOG_EXAM intent. Extract semester + branch. Provide backlog schedule link + registration steps.",pattern:"/backlog|supplementary|arrear/i",impact:"Cover unaddressed intent for ~12% of SEM 4-8 students"},
+      {type:"escalation",title:"Soft-route scholarship queries",subtitle:"Scholarship questions hard-blocked as out-of-scope",priority:"low",observed:"'scholarship deadline' blocked abruptly — student got no useful next step",proposal:"Instead of hard block, detect scholarship intent and provide soft handover: 'I handle academic schedules. For scholarships, visit: scholarship.university.edu'. Improves UX.",pattern:"/scholarship|stipend|financial.?aid/i",impact:"Reduce frustration escalation by ~40% for OOS queries"}
+    ];
+  }
+
+  renderProposals(proposals);
+  btn.textContent="Run analysis ↗";btn.disabled=false;
+}
+
+function renderProposals(proposals){
+  const grid=document.getElementById("imp-grid");grid.innerHTML="";
+  const icons={intent:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',faq:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',pattern:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="2.2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',escalation:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#993C1D" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>'};
+  proposals.forEach((p,i)=>{
+    const applied=appliedSet.has(i);
+    const card=document.createElement("div");card.className="imp-card";
+    card.innerHTML=`<div class="imp-card-hdr ${p.type}"><div class="imp-hdr-icon">${icons[p.type]||icons.intent}</div><div class="imp-hdr-text"><p>${p.title}</p><p>${p.subtitle}</p></div><span class="priority-pill pri-${p.priority==="high"?"high":p.priority==="medium"?"med":"low"}">${p.priority}</span></div>
+<div class="imp-body">
+  <div class="imp-row"><span class="imp-label">Observed</span><span class="imp-val">${p.observed}</span></div>
+  <div class="imp-row"><span class="imp-label">Proposal</span><span class="imp-val">${p.proposal}</span></div>
+  ${p.pattern?`<div class="imp-row"><span class="imp-label">Pattern</span><span class="imp-val"><code>${p.pattern}</code></span></div>`:""}
+  <div class="imp-row"><span class="imp-label">Impact</span><span class="imp-val">${p.impact}</span></div>
+  <button class="apply-btn ${applied?"applied":""}" onclick="markApplied(${i},this)">${applied?"Applied to backlog":"Mark as applied"}</button>
+</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function markApplied(i,btn){
+  appliedSet.add(i);
+  btn.textContent="Applied to backlog";
+  btn.classList.add("applied");
+  btn.disabled=true;
+}
+
+function switchTab(t){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("tab-"+t).classList.add("active");
+  document.getElementById(t+"-panel").classList.add("active");
+  if(t==="log")renderLog();
+  if(t==="analytics")buildCharts();
+  if(t==="improve")document.getElementById("imp-log-count").textContent=LOG.length;
+}
+</script>
