@@ -1,0 +1,549 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  #chat-root {
+    font-family: 'Sora', sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    background: var(--color-background-primary);
+  }
+
+  #chat-header {
+    padding: 14px 18px;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--color-background-secondary);
+  }
+
+  .header-icon {
+    width: 32px; height: 32px;
+    background: #185FA5;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .header-icon svg { width: 18px; height: 18px; }
+
+  #chat-header h2 {
+    font-size: 14px; font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  #chat-header p {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .badge-row {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+  }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 99px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .badge.date { background: #E6F1FB; color: #0C447C; }
+  .badge.course { background: #EAF3DE; color: #3B6D11; }
+  .badge.sem { background: #FAEEDA; color: #633806; }
+
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .msg-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .msg-row.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .avatar.bot { background: #185FA5; color: #E6F1FB; }
+  .avatar.user { background: var(--color-background-tertiary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); }
+
+  .bubble {
+    max-width: 82%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+  }
+
+  .bubble.bot {
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-top-left-radius: 4px;
+  }
+
+  .bubble.user {
+    background: #185FA5;
+    color: #E6F1FB;
+    border-top-right-radius: 4px;
+  }
+
+  .entity-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .pill.date { background: #E6F1FB; color: #0C447C; }
+  .pill.course { background: #EAF3DE; color: #27500A; }
+  .pill.sem { background: #FAEEDA; color: #633806; }
+  .pill-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+  }
+  .pill.date .pill-dot { background: #185FA5; }
+  .pill.course .pill-dot { background: #3B6D11; }
+  .pill.sem .pill-dot { background: #854F0B; }
+
+  .entity-section {
+    margin-top: 10px;
+    padding: 9px 12px;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: 8px;
+  }
+
+  .entity-section h4 {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .typing {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 10px 14px;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    background: var(--color-text-secondary);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  #chat-footer {
+    padding: 12px 16px;
+    border-top: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+  }
+
+  #input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  #user-input {
+    flex: 1;
+    padding: 9px 14px;
+    border-radius: 99px;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    font-family: 'Sora', sans-serif;
+    font-size: 13.5px;
+    outline: none;
+  }
+
+  #user-input:focus {
+    border-color: #378ADD;
+    box-shadow: 0 0 0 2px rgba(55,138,221,0.15);
+  }
+
+  #send-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #185FA5;
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  #send-btn:hover { background: #0C447C; }
+  #send-btn:disabled { background: var(--color-border-tertiary); cursor: default; }
+
+  .suggestions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .sug-btn {
+    font-size: 11.5px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-family: 'Sora', sans-serif;
+    transition: border-color 0.15s;
+  }
+
+  .sug-btn:hover {
+    border-color: #378ADD;
+    color: var(--color-text-primary);
+  }
+</style>
+
+<div id="chat-root">
+  <div id="chat-header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        <path d="M8 11h6M11 8v6"/>
+      </svg>
+    </div>
+    <div>
+      <h2>Academic Entity Bot</h2>
+      <p>Extracts dates, courses & semesters from your queries</p>
+    </div>
+    <div class="badge-row">
+      <span class="badge date">DATE</span>
+      <span class="badge course">COURSE</span>
+      <span class="badge sem">SEM</span>
+    </div>
+  </div>
+
+  <div id="messages">
+    <div class="msg-row">
+      <div class="avatar bot">AI</div>
+      <div class="bubble bot">
+        Hi! Ask me anything about exams, schedules, or courses. I'll extract key entities like <strong>dates</strong>, <strong>course codes</strong>, and <strong>semester numbers</strong> from your question and give you a smart response.
+        <div class="entity-pills" style="margin-top:8px;">
+          <span class="pill date"><span class="pill-dot"></span>dates</span>
+          <span class="pill course"><span class="pill-dot"></span>course codes</span>
+          <span class="pill sem"><span class="pill-dot"></span>semesters</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chat-footer">
+    <div id="input-row">
+      <input id="user-input" type="text" placeholder='e.g. "When is SEM 5 CS exam?"' autocomplete="off" />
+      <button id="send-btn" title="Send">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+          <path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/>
+        </svg>
+      </button>
+    </div>
+    <div class="suggestions">
+      <button class="sug-btn" onclick="fillAndSend('When is SEM 5 CS exam on 15 March?')">SEM 5 CS exam on 15 March?</button>
+      <button class="sug-btn" onclick="fillAndSend('What topics are in SEM 3 MATH101 for November?')">SEM 3 MATH101 November topics?</button>
+      <button class="sug-btn" onclick="fillAndSend('Is SEM 7 ECE301 exam on 22 April 2025?')">SEM 7 ECE301 on 22 April?</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTH_NAMES = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+const MONTH_SHORT = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+function extractEntities(text) {
+  const entities = { dates: [], courses: [], semesters: [] };
+  const lower = text.toLowerCase();
+
+  const semPatterns = [
+    /\bsem(?:ester)?\s*[-:]?\s*(\d+)\b/gi,
+    /\b(\d+)(?:st|nd|rd|th)\s+sem(?:ester)?\b/gi
+  ];
+  semPatterns.forEach(pat => {
+    let m;
+    while ((m = pat.exec(text)) !== null) {
+      const n = m[1];
+      if (!entities.semesters.includes('SEM ' + n)) entities.semesters.push('SEM ' + n);
+    }
+  });
+
+  const coursePatterns = [
+    /\b([A-Z]{2,6})\s*(\d{3,4}[A-Z]?)\b/g,
+    /\b([A-Z]{2,6})\s*-\s*(\d{3,4}[A-Z]?)\b/g
+  ];
+  coursePatterns.forEach(pat => {
+    let m;
+    while ((m = pat.exec(text)) !== null) {
+      const code = m[1] + m[2];
+      if (!entities.courses.includes(code) && !['SEM','THE','AND','FOR','ALL'].includes(m[1])) {
+        entities.courses.push(code);
+      }
+    }
+  });
+
+  const subjectWords = {
+    'cs': 'Computer Science','cse': 'Computer Science & Engineering',
+    'ece': 'Electronics & Communication','eee': 'Electrical & Electronics',
+    'me': 'Mechanical Engineering','ce': 'Civil Engineering',
+    'math': 'Mathematics','maths': 'Mathematics','phy': 'Physics',
+    'chem': 'Chemistry','ds': 'Data Structures','os': 'Operating Systems',
+    'dbms': 'Database Management','cn': 'Computer Networks',
+    'ai': 'Artificial Intelligence','ml': 'Machine Learning',
+    'java': 'Java Programming','python': 'Python','c': 'C Programming'
+  };
+  Object.keys(subjectWords).forEach(kw => {
+    const re = new RegExp('\\b' + kw + '\\b', 'gi');
+    if (re.test(text) && !entities.courses.find(c => c.toLowerCase().startsWith(kw))) {
+      entities.courses.push(subjectWords[kw]);
+    }
+  });
+
+  const datePatterns = [
+    { re: /\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})\b/g, fn: m => {
+      const [,d,mo,y] = m; return `${d.padStart(2,'0')}/${mo.padStart(2,'0')}/${y.length===2?'20'+y:y}`;
+    }},
+    { re: /\b(\d{1,2})\s*(january|february|march|april|may|june|july|august|september|october|november|december)\s*(\d{4})?\b/gi, fn: m => {
+      const [,d,mo,y] = m; return `${d} ${mo.charAt(0).toUpperCase()+mo.slice(1)}${y?' '+y:''}`;
+    }},
+    { re: /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s*(\d{1,2}),?\s*(\d{4})?\b/gi, fn: m => {
+      const [,mo,d,y] = m; return `${mo.charAt(0).toUpperCase()+mo.slice(1)} ${d}${y?', '+y:''}`;
+    }},
+    { re: /\b(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/gi, fn: m => {
+      const [,d,mo] = m; const full = MONTH_NAMES[MONTH_SHORT.indexOf(mo.toLowerCase())]; return `${d} ${full.charAt(0).toUpperCase()+full.slice(1)}`;
+    }}
+  ];
+  datePatterns.forEach(({re,fn}) => {
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      const d = fn(m);
+      if (!entities.dates.includes(d)) entities.dates.push(d);
+    }
+  });
+
+  const relDates = [/\btoday\b/i,/\btomorrow\b/i,/\bthis\s+week\b/i,/\bnext\s+week\b/i,/\bthis\s+month\b/i,/\bnext\s+month\b/i];
+  relDates.forEach(r => {
+    const match = text.match(r);
+    if (match && !entities.dates.includes(match[0])) entities.dates.push(match[0]);
+  });
+
+  return entities;
+}
+
+function buildReply(userText, entities) {
+  const hasSem = entities.semesters.length > 0;
+  const hasCourse = entities.courses.length > 0;
+  const hasDate = entities.dates.length > 0;
+  const lower = userText.toLowerCase();
+  const isExam = /exam|test|quiz|assessment|paper/i.test(lower);
+  const isSchedule = /schedule|timetable|time table|when|date/i.test(lower);
+  const isSyllabus = /syllabus|topic|chapter|subject|content/i.test(lower);
+  const isResult = /result|mark|grade|score/i.test(lower);
+
+  const semStr = hasSem ? entities.semesters.join(', ') : null;
+  const courseStr = hasCourse ? entities.courses.join(' / ') : null;
+  const dateStr = hasDate ? entities.dates.join(', ') : null;
+
+  let reply = '';
+
+  if (!hasSem && !hasCourse && !hasDate) {
+    return "I didn't detect any specific entities (semester, course, or date) in your message. Try asking something like: \"When is SEM 5 CS exam on 15 March?\" — I'll extract the entities and help you!";
+  }
+
+  if (isExam || isSchedule) {
+    if (hasSem && hasCourse && hasDate) {
+      reply = `For the <strong>${courseStr}</strong> examination in <strong>${semStr}</strong>, the date you mentioned is <strong>${dateStr}</strong>. Please verify this with your official college portal or notice board, as exam schedules are confirmed by your institution. Typically, hall tickets are available 5–7 days before the exam.`;
+    } else if (hasSem && hasCourse) {
+      reply = `You're asking about the <strong>${courseStr}</strong> exam for <strong>${semStr}</strong>. No specific date was detected in your query. Exam schedules are published by your institution's exam cell — check the official portal. Want to know about syllabus or preparation tips for this subject?`;
+    } else if (hasSem && hasDate) {
+      reply = `I found <strong>${semStr}</strong> exams scheduled around <strong>${dateStr}</strong>. No specific course code was mentioned. Semester exams usually run across multiple days — check your timetable for individual subjects. Is there a particular subject you're curious about?`;
+    } else if (hasCourse && hasDate) {
+      reply = `The exam for <strong>${courseStr}</strong> appears to be scheduled on <strong>${dateStr}</strong>. The semester wasn't explicitly mentioned — if there are multiple semesters offering this course, please specify which one for a more accurate answer.`;
+    } else if (hasSem) {
+      reply = `You asked about exams for <strong>${semStr}</strong>. Please specify the course code or subject name and the expected date for me to give a more precise answer. Semester exams are typically announced 2–3 weeks in advance.`;
+    } else if (hasCourse) {
+      reply = `You're asking about <strong>${courseStr}</strong>. Mention the semester (e.g., SEM 3) and a date if available, and I can give more contextual info. This subject is typically covered in specific semesters depending on your branch.`;
+    } else if (hasDate) {
+      reply = `You mentioned a date — <strong>${dateStr}</strong>. If you add the course and semester, I can help you find what exam falls on that day. Dates alone don't uniquely identify an exam without course context.`;
+    }
+  } else if (isSyllabus) {
+    if (hasSem && hasCourse) {
+      reply = `The syllabus for <strong>${courseStr}</strong> in <strong>${semStr}</strong> covers core concepts defined by your university's curriculum. Topics typically include foundational and advanced units as per the scheme of instruction. Check your institution's academic section or the official university website for the complete unit-wise breakdown.`;
+    } else if (hasCourse) {
+      reply = `For <strong>${courseStr}</strong>, the syllabus varies by semester and regulation. Specify the semester (e.g., SEM 4) to get more focused guidance on what's covered.`;
+    } else {
+      reply = `To look up the syllabus, please mention both the course name/code and the semester number. For example: "What is the SEM 3 DBMS syllabus?"`;
+    }
+  } else if (isResult) {
+    if (hasSem && hasCourse) {
+      reply = `Results for <strong>${courseStr}</strong> in <strong>${semStr}</strong> are typically published on the official university results portal after the evaluation period. If a date was mentioned (${dateStr || 'none detected'}), results may be expected shortly after. Keep your hall ticket and enrollment number handy.`;
+    } else {
+      reply = `For results-related queries, please mention the course and semester. Results are accessible via your institution's student login portal.`;
+    }
+  } else {
+    if (hasSem && hasCourse && hasDate) {
+      reply = `I detected: semester (<strong>${semStr}</strong>), course (<strong>${courseStr}</strong>), and date (<strong>${dateStr}</strong>). How can I help you with this combination? You can ask about the exam schedule, syllabus, or preparation strategy.`;
+    } else {
+      const parts = [];
+      if (hasSem) parts.push(`semester: <strong>${semStr}</strong>`);
+      if (hasCourse) parts.push(`course: <strong>${courseStr}</strong>`);
+      if (hasDate) parts.push(`date: <strong>${dateStr}</strong>`);
+      reply = `I found the following entities in your message — ${parts.join(', ')}. Could you clarify what you'd like to know? (e.g., exam date, syllabus, results, preparation tips)`;
+    }
+  }
+
+  return reply;
+}
+
+function renderPills(entities) {
+  const items = [];
+  entities.semesters.forEach(s => items.push({type:'sem', label: s}));
+  entities.courses.forEach(c => items.push({type:'course', label: c}));
+  entities.dates.forEach(d => items.push({type:'date', label: d}));
+  if (!items.length) return '';
+  return '<div class="entity-section"><h4>Extracted Entities</h4><div class="entity-pills">' +
+    items.map(i => `<span class="pill ${i.type}"><span class="pill-dot"></span>${i.label}</span>`).join('') +
+    '</div></div>';
+}
+
+function addMsg(role, htmlContent, entities) {
+  const container = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + role;
+  const av = document.createElement('div');
+  av.className = 'avatar ' + role;
+  av.textContent = role === 'bot' ? 'AI' : 'U';
+  const bub = document.createElement('div');
+  bub.className = 'bubble ' + role;
+  bub.innerHTML = htmlContent;
+  if (entities && role === 'bot') {
+    bub.innerHTML += renderPills(entities);
+  }
+  row.appendChild(av);
+  row.appendChild(bub);
+  container.appendChild(row);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const container = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row'; row.id = 'typing-indicator';
+  const av = document.createElement('div');
+  av.className = 'avatar bot'; av.textContent = 'AI';
+  const bub = document.createElement('div');
+  bub.className = 'bubble bot typing';
+  bub.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  row.appendChild(av); row.appendChild(bub);
+  container.appendChild(row);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+async function handleSend() {
+  const input = document.getElementById('user-input');
+  const btn = document.getElementById('send-btn');
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMsg('user', text, null);
+  input.value = '';
+  btn.disabled = true;
+  showTyping();
+
+  await new Promise(r => setTimeout(r, 700 + Math.random() * 500));
+
+  const entities = extractEntities(text);
+
+  try {
+    const systemPrompt = `You are an academic assistant chatbot specialized in answering questions about university exams, courses, and semesters. 
+The user's message has been pre-processed and the following entities were extracted:
+- Semesters: ${entities.semesters.join(', ') || 'none'}
+- Courses/Subjects: ${entities.courses.join(', ') || 'none'}
+- Dates: ${entities.dates.join(', ') || 'none'}
+
+Use these extracted entities to give a helpful, specific, and concise answer (2-4 sentences max). Reference the extracted entities naturally in your response. If no entities were found, ask the user to be more specific. Do not use markdown formatting like ** or ##. Keep responses friendly and practical.`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: text }]
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || buildReply(text, entities);
+    removeTyping();
+    addMsg('bot', reply, entities);
+  } catch(e) {
+    removeTyping();
+    addMsg('bot', buildReply(text, entities), entities);
+  }
+
+  btn.disabled = false;
+  input.focus();
+}
+
+function fillAndSend(txt) {
+  document.getElementById('user-input').value = txt;
+  handleSend();
+}
+
+document.getElementById('send-btn').addEventListener('click', handleSend);
+document.getElementById('user-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleSend();
+});
+</script>
