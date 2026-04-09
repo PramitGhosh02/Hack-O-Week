@@ -1,0 +1,298 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#root{font-family:var(--font-sans);display:flex;flex-direction:column;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+#top{display:flex;min-height:520px}
+/* chat */
+#chat{flex:1;display:flex;flex-direction:column;border-right:0.5px solid var(--color-border-tertiary);min-width:0}
+#chat-hdr{padding:11px 15px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:9px}
+.cav{width:30px;height:30px;border-radius:50%;background:#185FA5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#E6F1FB;flex-shrink:0}
+#chat-hdr h2{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+#chat-hdr p{font-size:11px;color:var(--color-text-secondary)}
+#msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:9px}
+.row{display:flex;gap:7px;align-items:flex-end}
+.row.u{flex-direction:row-reverse}
+.av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;flex-shrink:0}
+.av.b{background:#185FA5;color:#E6F1FB}
+.av.u{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.bub{max-width:83%;padding:8px 12px;border-radius:13px;font-size:12.5px;line-height:1.58;color:var(--color-text-primary)}
+.bub.b{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-bottom-left-radius:3px}
+.bub.u{background:#185FA5;color:#E6F1FB;border-bottom-right-radius:3px}
+.conf-bar-wrap{margin-top:6px;display:flex;align-items:center;gap:6px}
+.conf-label{font-size:10.5px;color:var(--color-text-tertiary);white-space:nowrap}
+.conf-track{flex:1;height:4px;border-radius:99px;background:var(--color-border-tertiary);overflow:hidden}
+.conf-fill{height:100%;border-radius:99px}
+.conf-pct{font-size:10.5px;font-weight:500;min-width:30px;text-align:right}
+.match-pill{display:inline-flex;align-items:center;gap:4px;margin-top:5px;padding:2px 8px;border-radius:99px;font-size:10.5px;background:#EEEDFE;color:#3C3489;font-family:var(--font-mono)}
+.chip-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.chip{font-size:11px;padding:2px 8px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+.chip:hover{border-color:#185FA5;color:#185FA5}
+#inp-area{padding:9px 13px;border-top:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;gap:6px}
+#qchips{display:flex;gap:4px;flex-wrap:wrap}
+.qc{font-size:11px;padding:2px 8px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+.qc:hover{border-color:#185FA5;color:#185FA5}
+#irow{display:flex;gap:7px;align-items:center}
+#inp{flex:1;padding:7px 12px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:12.5px;outline:none}
+#inp:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,.1)}
+#sbtn{width:30px;height:30px;border-radius:50%;border:none;background:#185FA5;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#sbtn:hover{background:#0C447C}
+#sbtn:disabled{background:var(--color-border-tertiary);cursor:default}
+/* right panel */
+#rpanel{width:320px;flex-shrink:0;display:flex;flex-direction:column}
+#rp-hdr{padding:11px 14px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+#rp-hdr h2{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+#rp-hdr p{font-size:11px;color:var(--color-text-secondary)}
+#scores-panel{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.score-idle{font-size:11.5px;color:var(--color-text-tertiary);font-style:italic;padding:6px}
+.score-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 10px;background:var(--color-background-primary)}
+.score-card.top{border-color:#185FA5;background:#E6F1FB}
+.sc-top{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.sc-rank{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.score-card.top .sc-rank{background:#185FA5;color:#E6F1FB}
+.sc-q{font-size:11.5px;font-weight:500;color:var(--color-text-primary);flex:1;line-height:1.3}
+.score-card.top .sc-q{color:#0C447C}
+.sc-score{font-size:11px;font-family:var(--font-mono);color:var(--color-text-secondary);white-space:nowrap}
+.score-card.top .sc-score{color:#185FA5;font-weight:500}
+.sc-bar-wrap{display:flex;align-items:center;gap:6px}
+.sc-bar{flex:1;height:3px;border-radius:99px;background:var(--color-border-tertiary);overflow:hidden}
+.sc-fill{height:100%;border-radius:99px;background:#888780}
+.score-card.top .sc-fill{background:#185FA5}
+.sc-terms{font-size:10.5px;color:var(--color-text-tertiary);margin-top:4px;font-family:var(--font-mono);line-height:1.4}
+.score-card.top .sc-terms{color:#0C447C}
+/* tfidf info strip */
+#tfidf-strip{padding:8px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.ts-item{font-size:11px;color:var(--color-text-secondary)}.ts-item b{color:var(--color-text-primary);font-weight:500}
+/* chart */
+#chart-area{padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary)}
+#chart-area p{font-size:11px;color:var(--color-text-secondary);margin-bottom:6px}
+/* typing */
+.typing-bub{display:flex;gap:3px;align-items:center;padding:4px 0}
+.dt{width:5px;height:5px;border-radius:50%;background:var(--color-text-secondary);animation:bop 1.2s infinite;opacity:.4}
+.dt:nth-child(2){animation-delay:.2s}.dt:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+</style>
+
+<div id="root">
+ <div id="top">
+  <div id="chat">
+   <div id="chat-hdr">
+    <div class="cav">AI</div>
+    <div><h2>TF-IDF Retrieval Chatbot</h2><p>Cosine similarity over 20 FAQ documents</p></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#639922"></div><span style="font-size:11px;color:var(--color-text-secondary)">Index ready</span></div>
+   </div>
+   <div id="msgs"></div>
+   <div id="inp-area">
+    <div id="qchips">
+     <button class="qc" onclick="go('when is the semester exam schedule')">semester exam schedule</button>
+     <button class="qc" onclick="go('how much is the tuition fee')">tuition fee amount</button>
+     <button class="qc" onclick="go('minimum attendance required for exam')">attendance requirement</button>
+     <button class="qc" onclick="go('how to download hall ticket')">hall ticket download</button>
+     <button class="qc" onclick="go('hostel room allocation process')">hostel allocation</button>
+     <button class="qc" onclick="go('placement cell contact and package')">placement info</button>
+     <button class="qc" onclick="go('revaluation form submission deadline')">revaluation deadline</button>
+    </div>
+    <div id="irow">
+     <input id="inp" type="text" placeholder="Ask any institute question…" autocomplete="off"/>
+     <button id="sbtn" onclick="go()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg></button>
+    </div>
+   </div>
+  </div>
+  <div id="rpanel">
+   <div id="rp-hdr"><h2>Retrieval scores</h2><p>Top 5 FAQ matches by TF-IDF cosine similarity</p></div>
+   <div id="scores-panel"><div class="score-idle">Send a query to see ranked FAQ matches…</div></div>
+   <div id="tfidf-strip">
+    <span class="ts-item">Corpus: <b>20 FAQs</b></span>
+    <span class="ts-item">Vocab: <b id="vocab-size">—</b> terms</span>
+    <span class="ts-item">Last query tokens: <b id="query-tokens">—</b></span>
+    <span class="ts-item">Top score: <b id="top-score">—</b></span>
+   </div>
+  </div>
+ </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const FAQS=[
+ {id:0,cat:"exam",q:"When is the semester examination schedule released?",a:"The semester examination timetable is published on the official portal 3 weeks before exam commencement. Odd semester exams run in November, even semester in April–May. Check portal.institute.edu/exams for the latest schedule."},
+ {id:1,cat:"exam",q:"How do I download my hall ticket for the exam?",a:"Hall tickets are available on the student portal 7 days before exams begin. Log in to portal.institute.edu → Examination → Hall Ticket → Download. Print a copy and bring it to every exam. Lost hall tickets can be reissued at the exam cell."},
+ {id:2,cat:"exam",q:"What is the procedure for revaluation of exam papers?",a:"Revaluation forms are available 10 days after result publication. Submit the form with ₹500 per subject fee to the exam cell. Results are declared within 30 days. Contact examcell@institute.edu for status updates."},
+ {id:3,cat:"exam",q:"What are the rules for supplementary and backlog exams?",a:"Supplementary exams for students who failed or were absent are held every July. You must register within 15 days of result declaration. Backlog students can appear a maximum of 3 times per subject before mandatory counselling."},
+ {id:4,cat:"exam",q:"Can I get grace marks to pass the examination?",a:"Grace marks up to 5 per subject are awarded to borderline candidates (within 5 marks of passing). Applications must be submitted before results are finalised. The exam cell reviews cases individually. No grace marks after result publication."},
+ {id:5,cat:"fees",q:"What is the tuition fee structure for each semester?",a:"Fee per semester: Tuition ₹42,500 | Development ₹5,000 | Lab charges ₹3,000 | Exam fee ₹1,500 | Total ₹52,000. Hostel students pay an additional ₹6,500/month. Fees are due within the first 15 days of semester commencement."},
+ {id:6,cat:"fees",q:"What is the last date to pay fees and what is the late fine?",a:"Fees must be paid within the first 15 days of the semester. After that, a late fine of ₹100/day applies. Students with outstanding dues are not permitted to sit for internal or external exams. Pay via portal.institute.edu/fees."},
+ {id:7,cat:"fees",q:"What is the fee refund policy for withdrawn students?",a:"Refund policy: Before semester start — 100% refund. Within 15 days — 75%. Days 16–30 — 50%. After 30 days — no refund. Apply for refund at the accounts office with your original fee receipt and withdrawal form."},
+ {id:8,cat:"fees",q:"How can I pay fees online using UPI or net banking?",a:"Online payment is available at portal.institute.edu/fees. Accepted modes: UPI, Net Banking, Debit/Credit Card, and Paytm. After payment, download the e-receipt and submit a copy to the accounts office within 3 working days."},
+ {id:9,cat:"attendance",q:"What is the minimum attendance percentage required to appear in exams?",a:"A minimum of 75% attendance is mandatory per subject to be eligible for end-semester examinations. Students between 65–74% may apply for medical or sports condonation. Below 65% results in automatic debarment from exams."},
+ {id:10,cat:"attendance",q:"How is attendance shortage condonation processed?",a:"Students with 65–74% attendance can apply for condonation with valid medical certificates or sports participation letters. Applications must be submitted to the HOD within 7 days of the last working day. Approval is at the department's discretion."},
+ {id:11,cat:"academic",q:"When does the new semester start and what is the academic calendar?",a:"Academic Calendar 2024–25: Odd semester starts July 15, ends November 30. Even semester starts January 6, ends May 10. Summer break is May 15–July 14. Full calendar at portal.institute.edu/academics."},
+ {id:12,cat:"academic",q:"Where can I find the syllabus and curriculum for my course?",a:"Syllabi are available at portal.institute.edu/academics → Departments → Your Branch → Semester. Printed copies available in the library. Any syllabus revision is announced via department notice boards and the student email system."},
+ {id:13,cat:"academic",q:"What is the internal assessment scheme and how are marks calculated?",a:"Internal marks (40% of total) comprise: 2 unit tests (20 marks each), assignments (10), attendance (10). External exams carry 60 marks. Both internals and externals must be passed separately with a minimum of 40%."},
+ {id:14,cat:"contacts",q:"What is the exam cell contact number and email address?",a:"Exam Cell: Room 105, Admin Block. Phone: +91 98765 43210. Email: examcell@institute.edu. Office hours: Monday–Friday, 9 AM–4 PM. For urgent queries outside hours, email the Deputy Controller of Examinations."},
+ {id:15,cat:"contacts",q:"How can I contact the student support desk for grievances?",a:"Student Support: Ground Floor, Student Centre. Phone: +91 90000 55555. Email: support@institute.edu. Walk-in: Mon–Sat, 9 AM–5 PM. Online ticket: portal.institute.edu/support. Response within 24 working hours."},
+ {id:16,cat:"contacts",q:"Who is the principal and how do I get an appointment?",a:"Principal: Dr. Ramesh Iyer, Ph.D. Room 201, Main Building. Phone: +91 98001 12345. Email: principal@institute.edu. Appointment slots: Tuesday and Thursday, 11 AM–1 PM. Book via the administration office or email the PA."},
+ {id:17,cat:"facilities",q:"How do I apply for hostel accommodation and what are the charges?",a:"Hostel capacity: Boys 450 seats, Girls 350 seats. Monthly charges: ₹6,500 including mess. Apply via portal.institute.edu/hostel by June 30. Allocation is on a first-come first-served basis. Warden: +91 99887 76655."},
+ {id:18,cat:"facilities",q:"What are the placement cell details and average package offered?",a:"Training & Placement Cell: Room 301, New Block. Phone: +91 97000 11223. Email: placement@institute.edu. 2023 stats: Average package ₹6.8 LPA, Highest ₹24 LPA, 120+ companies. Pre-placement training starts in SEM 6."},
+ {id:19,cat:"facilities",q:"What library facilities and resources are available to students?",a:"Library hours: Mon–Sat 8 AM–8 PM, Sun 10 AM–4 PM (extended to 10 PM during exams). Holdings: 45,000+ books, 200+ journals, 10 online databases. OPAC available at library.institute.edu. 3 books per student, 14-day loan period."}
+];
+
+const STOP=new Set(["a","an","the","is","are","was","were","be","been","being","have","has","had","do","does","did","will","would","could","should","may","might","i","me","my","we","our","you","your","he","she","it","they","them","their","this","that","these","those","of","in","on","at","to","for","with","by","from","as","into","about","and","or","but","if","when","where","how","what","which","who","can","not","no","any","all","some","more","most","very","just","also","its","per","each","both","between","after","before","within","without","get","go","give","take","make","use","need","want","like","please","sir","hi","hello","tell","know"]);
+
+function tokenize(text){
+  return text.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>1&&!STOP.has(w));
+}
+
+/* Build TF-IDF index */
+const corpus=FAQS.map(f=>tokenize(f.q+' '+f.a));
+const N=corpus.length;
+
+function tf(tokens){
+  const freq={};tokens.forEach(t=>{freq[t]=(freq[t]||0)+1;});
+  const len=tokens.length||1;
+  Object.keys(freq).forEach(k=>{freq[k]=freq[k]/len;});
+  return freq;
+}
+
+function buildIDF(corpus){
+  const df={};
+  corpus.forEach(doc=>{
+    const seen=new Set(doc);
+    seen.forEach(t=>{df[t]=(df[t]||0)+1;});
+  });
+  const idf={};
+  Object.keys(df).forEach(t=>{idf[t]=Math.log((N+1)/(df[t]+1))+1;});
+  return idf;
+}
+
+const idf=buildIDF(corpus);
+const vocab=Object.keys(idf);
+
+function tfidfVec(tokens){
+  const tfv=tf(tokens);
+  const vec={};
+  Object.keys(tfv).forEach(t=>{vec[t]=(tfv[t]||0)*(idf[t]||Math.log(N+1)+1);});
+  return vec;
+}
+
+function cosineSim(a,b){
+  const keys=new Set([...Object.keys(a),...Object.keys(b)]);
+  let dot=0,na=0,nb=0;
+  keys.forEach(k=>{
+    const av=a[k]||0,bv=b[k]||0;
+    dot+=av*bv;na+=av*av;nb+=bv*bv;
+  });
+  return na&&nb?dot/(Math.sqrt(na)*Math.sqrt(nb)):0;
+}
+
+// Precompute document vectors
+const docVecs=corpus.map(toks=>tfidfVec(toks));
+
+document.getElementById('vocab-size').textContent=vocab.length;
+
+function retrieve(query,topK=5){
+  const qToks=tokenize(query);
+  const qVec=tfidfVec(qToks);
+  const scores=FAQS.map((f,i)=>({
+    faq:f,
+    score:cosineSim(qVec,docVecs[i]),
+    matchTerms:qToks.filter(t=>docVecs[i][t]&&qVec[t])
+  }));
+  scores.sort((a,b)=>b.score-a.score);
+  return{results:scores.slice(0,topK),qToks};
+}
+
+/* UI */
+const CONF_THRESHOLD=0.05;
+
+function addMsg(role,html){
+  const c=document.getElementById('msgs');
+  const row=document.createElement('div');row.className='row '+(role==='u'?'u':'');
+  const av=document.createElement('div');av.className='av '+(role==='u'?'u':'b');av.textContent=role==='u'?'U':'AI';
+  const bub=document.createElement('div');bub.className='bub '+(role==='u'?'u':'b');bub.innerHTML=html;
+  row.appendChild(av);row.appendChild(bub);c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  const c=document.getElementById('msgs');const r=document.createElement('div');r.className='row';r.id='typ';
+  const av=document.createElement('div');av.className='av b';av.textContent='AI';
+  const bub=document.createElement('div');bub.className='bub b';bub.innerHTML='<div class="typing-bub"><div class="dt"></div><div class="dt"></div><div class="dt"></div></div>';
+  r.appendChild(av);r.appendChild(bub);c.appendChild(r);c.scrollTop=c.scrollHeight;
+}
+function removeTyping(){const e=document.getElementById('typ');if(e)e.remove();}
+
+function confColor(s){return s>=0.4?'#185FA5':s>=0.2?'#BA7517':'#888780';}
+
+function renderScores(results,qToks){
+  const panel=document.getElementById('scores-panel');
+  panel.innerHTML='';
+  const maxScore=results[0]?.score||1;
+  results.forEach((r,i)=>{
+    const pct=maxScore>0?Math.round(r.score/maxScore*100):0;
+    const scoreDisplay=(r.score*100).toFixed(1);
+    const card=document.createElement('div');
+    card.className='score-card'+(i===0?' top':'');
+    card.innerHTML=`
+      <div class="sc-top">
+        <div class="sc-rank">${i+1}</div>
+        <div class="sc-q">${r.faq.q}</div>
+        <div class="sc-score">${scoreDisplay}</div>
+      </div>
+      <div class="sc-bar-wrap">
+        <div class="sc-bar"><div class="sc-fill" style="width:${pct}%"></div></div>
+        <span style="font-size:10px;color:var(--color-text-tertiary);min-width:28px;text-align:right">${pct}%</span>
+      </div>
+      ${r.matchTerms.length?`<div class="sc-terms">matched: ${r.matchTerms.slice(0,6).join(', ')}</div>`:''}
+    `;
+    card.style.cursor='pointer';
+    card.addEventListener('click',()=>{
+      document.getElementById('inp').value=r.faq.q;
+    });
+    panel.appendChild(card);
+  });
+  document.getElementById('query-tokens').textContent=qToks.length;
+  document.getElementById('top-score').textContent=(results[0]?.score*100||0).toFixed(1);
+}
+
+let chartInst=null;
+
+async function go(preset){
+  const inp=document.getElementById('inp');const btn=document.getElementById('sbtn');
+  const query=(preset||inp.value).trim();if(!query)return;
+  inp.value='';btn.disabled=true;
+  addMsg('u',query);
+  showTyping();
+  await new Promise(r=>setTimeout(r,350+Math.random()*300));
+  removeTyping();
+
+  const {results,qToks}=retrieve(query);
+  renderScores(results,qToks);
+
+  const top=results[0];
+  const score=top?.score||0;
+
+  let botHtml='';
+  if(score<CONF_THRESHOLD){
+    botHtml=`I couldn't find a strong match for that query in my FAQ database (top similarity: ${(score*100).toFixed(1)}%). Try rephrasing, or ask about: exam schedule, fees, attendance, hall ticket, hostel, placement, or library.`;
+    const alts=results.slice(0,3).filter(r=>r.score>0);
+    if(alts.length){
+      botHtml+=`<div class="chip-row">${alts.map(r=>`<span class="chip" onclick="go('${r.faq.q.replace(/'/g,"\\'")}')">${r.faq.q.substring(0,40)}…</span>`).join('')}</div>`;
+    }
+  }else{
+    botHtml=top.faq.a;
+    const pct=(score*100).toFixed(1);
+    const color=confColor(score);
+    botHtml+=`<div class="conf-bar-wrap"><span class="conf-label">Confidence</span><div class="conf-track"><div class="conf-fill" style="width:${Math.min(score*250,100)}%;background:${color}"></div></div><span class="conf-pct" style="color:${color}">${pct}</span></div>`;
+    botHtml+=`<span class="match-pill"><svg style="width:10px;height:10px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>FAQ #${top.faq.id+1} · ${top.faq.cat}</span>`;
+    if(results.length>1&&results[1].score>0.03){
+      const alts=results.slice(1,3).filter(r=>r.score>0.03);
+      if(alts.length)botHtml+=`<div class="chip-row"><span style="font-size:10.5px;color:var(--color-text-tertiary)">Related:</span>${alts.map(r=>`<span class="chip" onclick="go('${r.faq.q.replace(/'/g,"\\'")}')">${r.faq.q.substring(0,35)}…</span>`).join('')}</div>`;
+    }
+  }
+
+  addMsg('b',botHtml);
+  btn.disabled=false;inp.focus();
+}
+
+document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+
+addMsg('b',`TF-IDF retrieval index built over <strong>20 institute FAQs</strong> across 5 categories. Each query is tokenised, stop words removed, and vectorised using TF-IDF weights. Cosine similarity ranks all 20 documents — the top match answers your query. Confidence scores and matched terms are shown on the right panel.
+<div class="chip-row"><span class="chip" onclick="go('semester exam schedule dates')">exam schedule</span><span class="chip" onclick="go('fee payment deadline fine')">fee deadline</span><span class="chip" onclick="go('attendance shortage condonation')">attendance</span></div>`);
+</script>
