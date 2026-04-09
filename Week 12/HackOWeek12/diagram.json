@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "author": "Antigravity",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 100, "left": -100, "attrs": {} },
+    { "type": "wokwi-hc-sr04", "id": "ultrasonic", "top": -30, "left": 100, "attrs": {} },
+    { "type": "wokwi-buzzer", "id": "buzzer", "top": 50, "left": 250, "attrs": {} },
+    { "type": "wokwi-led", "id": "led", "top": 150, "left": 250, "attrs": { "color": "green" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": 190, "left": 250, "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "uno:5V", "ultrasonic:VCC", "red", [] ],
+    [ "uno:GND.1", "ultrasonic:GND", "black", [] ],
+    [ "uno:9", "ultrasonic:TRIG", "green", [] ],
+    [ "uno:10", "ultrasonic:ECHO", "orange", [] ],
+    [ "buzzer:2", "uno:11", "purple", [] ],
+    [ "buzzer:1", "uno:GND.2", "black", [] ],
+    [ "uno:12", "led:A", "yellow", [] ],
+    [ "led:C", "r1:2", "green", [] ],
+    [ "r1:1", "uno:GND.2", "black", [] ]
+  ]
+}
