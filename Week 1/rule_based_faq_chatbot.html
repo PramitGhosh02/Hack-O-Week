@@ -1,0 +1,410 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+#shell{display:flex;gap:0;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;min-height:600px}
+
+/* sidebar */
+#sidebar{width:210px;flex-shrink:0;border-right:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);display:flex;flex-direction:column}
+#sb-hdr{padding:14px 14px 10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+#sb-hdr p{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+#sb-hdr span{font-size:11px;color:var(--color-text-secondary)}
+#faq-list{flex:1;overflow-y:auto;padding:8px}
+.faq-cat{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em;padding:8px 6px 4px}
+.faq-item{padding:6px 8px;border-radius:6px;font-size:12px;color:var(--color-text-secondary);cursor:pointer;display:flex;align-items:center;gap:7px;line-height:1.3}
+.faq-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.faq-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.faq-dot.timings{background:#185FA5}
+.faq-dot.fees{background:#3B6D11}
+.faq-dot.contacts{background:#854F0B}
+.faq-dot.academic{background:#534AB7}
+.faq-dot.facilities{background:#993C1D}
+#sb-footer{padding:10px 12px;border-top:0.5px solid var(--color-border-tertiary)}
+.sb-stat{font-size:10.5px;color:var(--color-text-tertiary);display:flex;justify-content:space-between}
+
+/* chat area */
+#chat-area{flex:1;display:flex;flex-direction:column;background:var(--color-background-primary)}
+#chat-hdr{padding:11px 16px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:10px;background:var(--color-background-secondary)}
+.chat-av{width:30px;height:30px;border-radius:50%;background:#185FA5;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#E6F1FB;flex-shrink:0}
+#chat-hdr h2{font-size:13.5px;font-weight:500;color:var(--color-text-primary)}
+#chat-hdr p{font-size:11px;color:var(--color-text-secondary)}
+.online{display:flex;align-items:center;gap:4px;margin-left:auto}
+.online-dot{width:6px;height:6px;border-radius:50%;background:#639922}
+.online span{font-size:11px;color:var(--color-text-secondary)}
+
+/* rule badge */
+#rule-badge{padding:5px 14px;background:#EEEDFE;border-bottom:0.5px solid #AFA9EC;display:flex;align-items:center;gap:6px;font-size:11px;color:#3C3489}
+#rule-badge svg{width:12px;height:12px;flex-shrink:0}
+#rule-text{flex:1}
+
+/* messages */
+#msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;align-items:flex-end}
+.row.user{flex-direction:row-reverse}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.av.bot{background:#185FA5;color:#E6F1FB}
+.av.user{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.bub{max-width:80%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.6;color:var(--color-text-primary)}
+.bub.bot{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-bottom-left-radius:3px}
+.bub.user{background:#185FA5;color:#E6F1FB;border-bottom-right-radius:3px}
+.bub table{width:100%;border-collapse:collapse;margin-top:6px;font-size:12px}
+.bub td{padding:4px 6px;border:0.5px solid var(--color-border-tertiary)}
+.bub td:first-child{color:var(--color-text-secondary);white-space:nowrap}
+.rule-tag{display:inline-flex;align-items:center;gap:3px;margin-top:6px;padding:2px 7px;border-radius:99px;font-size:10.5px;background:#EEEDFE;color:#3C3489}
+.rule-tag svg{width:10px;height:10px}
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.chip{padding:3px 9px;border-radius:99px;font-size:11.5px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+.chip:hover{border-color:#185FA5;color:#185FA5}
+.fallback-card{margin-top:7px;border:0.5px solid var(--color-border-tertiary);border-radius:10px;overflow:hidden}
+.fc-hdr{padding:7px 11px;background:#FAEEDA;font-size:11.5px;font-weight:500;color:#633806;display:flex;align-items:center;gap:5px}
+.fc-body{padding:9px 11px;display:flex;flex-direction:column;gap:5px}
+.fc-row{display:flex;align-items:center;gap:7px;padding:5px 8px;border:0.5px solid var(--color-border-tertiary);border-radius:7px;cursor:pointer;font-size:12px;color:var(--color-text-secondary)}
+.fc-row:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+
+/* quick chips */
+#quick-bar{padding:6px 14px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:5px;flex-wrap:wrap}
+.qc{padding:3px 9px;border-radius:99px;font-size:11px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+.qc:hover{border-color:#185FA5;color:#185FA5}
+
+/* input */
+#inp-row{padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:8px;align-items:center}
+#inp{flex:1;padding:8px 14px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:13px;outline:none}
+#inp:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,.1)}
+#sbtn{width:34px;height:34px;border-radius:50%;border:none;background:#185FA5;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#sbtn:hover{background:#0C447C}
+
+.dot-anim{display:flex;gap:3px;align-items:center;padding:2px 0}
+.dt{width:5px;height:5px;border-radius:50%;background:var(--color-text-secondary);animation:bop 1.2s infinite;opacity:.4}
+.dt:nth-child(2){animation-delay:.2s}.dt:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+</style>
+
+<div id="shell">
+  <div id="sidebar">
+    <div id="sb-hdr">
+      <p>Institute FAQs</p>
+      <span>15 rules · pattern matching</span>
+    </div>
+    <div id="faq-list">
+      <div class="faq-cat">Timings</div>
+      <div class="faq-item" onclick="send('What are the college timings?')"><div class="faq-dot timings"></div>College timings</div>
+      <div class="faq-item" onclick="send('When does the library open?')"><div class="faq-dot timings"></div>Library hours</div>
+      <div class="faq-item" onclick="send('What are office hours?')"><div class="faq-dot timings"></div>Office hours</div>
+      <div class="faq-item" onclick="send('What time does the canteen open?')"><div class="faq-dot timings"></div>Canteen timings</div>
+
+      <div class="faq-cat">Fees</div>
+      <div class="faq-item" onclick="send('What is the tuition fee?')"><div class="faq-dot fees"></div>Tuition fee</div>
+      <div class="faq-item" onclick="send('When is the fee due date?')"><div class="faq-dot fees"></div>Fee due date</div>
+      <div class="faq-item" onclick="send('Is there a fee refund policy?')"><div class="faq-dot fees"></div>Refund policy</div>
+      <div class="faq-item" onclick="send('How to pay fees online?')"><div class="faq-dot fees"></div>Online payment</div>
+
+      <div class="faq-cat">Contacts</div>
+      <div class="faq-item" onclick="send('What is the exam cell contact?')"><div class="faq-dot contacts"></div>Exam cell</div>
+      <div class="faq-item" onclick="send('Who is the principal?')"><div class="faq-dot contacts"></div>Principal contact</div>
+      <div class="faq-item" onclick="send('How to reach student support?')"><div class="faq-dot contacts"></div>Student support</div>
+
+      <div class="faq-cat">Academic</div>
+      <div class="faq-item" onclick="send('When does the semester start?')"><div class="faq-dot academic"></div>Semester dates</div>
+      <div class="faq-item" onclick="send('What is the attendance requirement?')"><div class="faq-dot academic"></div>Attendance rule</div>
+
+      <div class="faq-cat">Facilities</div>
+      <div class="faq-item" onclick="send('Is hostel available?')"><div class="faq-dot facilities"></div>Hostel info</div>
+      <div class="faq-item" onclick="send('Is there a placement cell?')"><div class="faq-dot facilities"></div>Placement cell</div>
+    </div>
+    <div id="sb-footer">
+      <div class="sb-stat"><span>Matched</span><span id="stat-matched">0</span></div>
+      <div class="sb-stat"><span>Fallbacks</span><span id="stat-fallback">0</span></div>
+      <div class="sb-stat"><span>Total queries</span><span id="stat-total">0</span></div>
+    </div>
+  </div>
+
+  <div id="chat-area">
+    <div id="chat-hdr">
+      <div class="chat-av">AI</div>
+      <div>
+        <h2>Institute Info Bot</h2>
+        <p>Rule-based · 15 FAQs · pattern matching</p>
+      </div>
+      <div class="online"><div class="online-dot"></div><span>Active</span></div>
+    </div>
+
+    <div id="rule-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span id="rule-text">Rule engine ready — type a query or click an FAQ on the left</span>
+    </div>
+
+    <div id="msgs"></div>
+
+    <div id="quick-bar">
+      <button class="qc" onclick="send('college timings')">Timings</button>
+      <button class="qc" onclick="send('fee structure')">Fees</button>
+      <button class="qc" onclick="send('exam cell number')">Exam cell</button>
+      <button class="qc" onclick="send('attendance percentage required')">Attendance</button>
+      <button class="qc" onclick="send('hostel')">Hostel</button>
+      <button class="qc" onclick="send('placement')">Placement</button>
+      <button class="qc" onclick="send('library open time')">Library</button>
+    </div>
+
+    <div id="inp-row">
+      <input id="inp" type="text" placeholder="Ask anything about the institute…" autocomplete="off"/>
+      <button id="sbtn" onclick="send()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let matched=0,fallbacks=0,total=0;
+
+const RULES=[
+  {
+    id:"college_timings",
+    category:"timings",
+    patterns:[/college\s*timing/i,/institute\s*timing/i,/college\s*(hour|time|open|clos)/i,/when.*college\s*(open|clos|start)/i,/what\s*time.*college/i],
+    answer:"College timings",
+    type:"table",
+    data:[["Monday – Friday","8:00 AM – 5:00 PM"],["Saturday","8:00 AM – 1:00 PM"],["Sunday","Closed"],["Holidays","As per academic calendar"]],
+    rule:"RULE_01: /college timing|college hour|college open/"
+  },
+  {
+    id:"library",
+    category:"timings",
+    patterns:[/library/i],
+    answer:"Library hours",
+    type:"table",
+    data:[["Mon – Sat","8:00 AM – 8:00 PM"],["Sunday","10:00 AM – 4:00 PM"],["During exams","8:00 AM – 10:00 PM"],["Issue / return","9:00 AM – 5:00 PM"]],
+    rule:"RULE_02: /library/"
+  },
+  {
+    id:"office_hours",
+    category:"timings",
+    patterns:[/office\s*(hour|timing|time)/i,/admin\s*(office|hour)/i,/administration\s*(hour|timing)/i],
+    answer:"Administrative office hours",
+    type:"table",
+    data:[["Mon – Fri","9:00 AM – 4:30 PM"],["Saturday","9:00 AM – 12:30 PM"],["Lunch break","1:00 PM – 2:00 PM"]],
+    rule:"RULE_03: /office hour|admin office/"
+  },
+  {
+    id:"canteen",
+    category:"timings",
+    patterns:[/canteen/i,/cafeteria/i,/food\s*(court|stall)/i,/mess\s*(time|hour|timing)/i],
+    answer:"Canteen & mess timings",
+    type:"table",
+    data:[["Breakfast","7:30 AM – 9:30 AM"],["Lunch","12:00 PM – 2:30 PM"],["Snacks","4:00 PM – 5:30 PM"],["Dinner (hostel)","7:00 PM – 9:00 PM"]],
+    rule:"RULE_04: /canteen|cafeteria|mess/"
+  },
+  {
+    id:"tuition_fee",
+    category:"fees",
+    patterns:[/tuition\s*fee/i,/fee\s*struct/i,/how\s*much.*fee/i,/course\s*fee/i,/annual\s*fee/i,/semester\s*fee/i,/fee\s*amount/i],
+    answer:"Fee structure (per semester)",
+    type:"table",
+    data:[["Tuition fee","₹ 42,500"],["Development fee","₹ 5,000"],["Lab charges","₹ 3,000"],["Exam fee","₹ 1,500"],["Total per semester","₹ 52,000"]],
+    rule:"RULE_05: /tuition fee|fee struct|fee amount/"
+  },
+  {
+    id:"fee_due",
+    category:"fees",
+    patterns:[/fee\s*due/i,/pay.*fee.*by/i,/last\s*date.*fee/i,/deadline.*fee/i,/fee.*deadline/i,/when.*pay.*fee/i],
+    answer:"Fee payment deadline",
+    type:"text",
+    text:"Fee for each semester must be paid within the first 15 days of the semester commencement. Late payments attract a fine of ₹100 per day. Students with dues are not permitted to sit for internal exams.",
+    rule:"RULE_06: /fee due|last date.*fee|fee deadline/"
+  },
+  {
+    id:"refund",
+    category:"fees",
+    patterns:[/refund/i,/fee\s*back/i,/money\s*back/i,/cancel.*admis/i],
+    answer:"Fee refund policy",
+    type:"table",
+    data:[["Before semester starts","100% refund"],["Within 15 days of start","75% refund"],["16 – 30 days","50% refund"],["After 30 days","No refund"]],
+    rule:"RULE_07: /refund|fee back/"
+  },
+  {
+    id:"online_payment",
+    category:"fees",
+    patterns:[/online.*pay/i,/pay.*online/i,/net\s*banking/i,/upi.*fee/i,/fee.*upi/i,/how.*pay.*fee/i],
+    answer:"Online fee payment",
+    type:"text",
+    text:"Fees can be paid online at the student portal: portal.institute.edu/fees. Accepted modes: UPI, Net Banking, Debit/Credit Card. After payment, download the receipt and submit a copy to the accounts office within 3 working days.",
+    rule:"RULE_08: /online pay|net banking|upi.*fee/"
+  },
+  {
+    id:"exam_cell",
+    category:"contacts",
+    patterns:[/exam\s*cell/i,/examination\s*(cell|office|department)/i,/exam.*contact/i,/contact.*exam/i],
+    answer:"Exam cell contact",
+    type:"table",
+    data:[["Office","Room 105, Admin Block"],["Phone","+91 98765 43210"],["Email","examcell@institute.edu"],["Hours","Mon–Fri, 9 AM – 4 PM"]],
+    rule:"RULE_09: /exam cell|examination office/"
+  },
+  {
+    id:"principal",
+    category:"contacts",
+    patterns:[/principal/i,/head\s*of\s*(institute|institution|college)/i,/director/i],
+    answer:"Principal's office",
+    type:"table",
+    data:[["Name","Dr. Ramesh Iyer, Ph.D"],["Room","201, Main Building"],["Phone","+91 98001 12345"],["Email","principal@institute.edu"],["Office hours","Tue & Thu, 11 AM – 1 PM (by appointment)"]],
+    rule:"RULE_10: /principal|head of institute|director/"
+  },
+  {
+    id:"student_support",
+    category:"contacts",
+    patterns:[/student\s*support/i,/helpdesk/i,/help\s*desk/i,/grievance/i,/complaint/i,/student\s*service/i],
+    answer:"Student support desk",
+    type:"table",
+    data:[["Location","Ground Floor, Student Centre"],["Phone","+91 90000 55555"],["Email","support@institute.edu"],["Walk-in","Mon–Sat, 9 AM – 5 PM"],["Online","portal.institute.edu/support"]],
+    rule:"RULE_11: /student support|helpdesk|grievance/"
+  },
+  {
+    id:"semester_dates",
+    category:"academic",
+    patterns:[/semester\s*(start|begin|end|date|schedule)/i,/academic\s*(calendar|schedule|session)/i,/when.*semester/i,/odd\s*semester/i,/even\s*semester/i],
+    answer:"Academic calendar 2024–25",
+    type:"table",
+    data:[["Odd sem start","July 15, 2024"],["Odd sem end","November 30, 2024"],["Even sem start","January 6, 2025"],["Even sem end","May 10, 2025"],["Summer break","May 15 – July 14, 2025"]],
+    rule:"RULE_12: /semester start|academic calendar/"
+  },
+  {
+    id:"attendance",
+    category:"academic",
+    patterns:[/attendance/i,/minimum.*attend/i,/attend.*requir/i,/how\s*many.*class/i,/absence.*allow/i,/bunk/i],
+    answer:"Attendance policy",
+    type:"text",
+    text:"A minimum of 75% attendance is mandatory in each subject to be eligible for end-semester examinations. Students between 65–74% may apply for a medical/sports condonation. Below 65% results in automatic debarment from exams.",
+    rule:"RULE_13: /attendance|absent|bunk/"
+  },
+  {
+    id:"hostel",
+    category:"facilities",
+    patterns:[/hostel/i,/accommodation/i,/dormitor/i,/room.*allot/i,/boarding/i,/stay.*campus/i],
+    answer:"Hostel facilities",
+    type:"table",
+    data:[["Boys hostel capacity","450 seats"],["Girls hostel capacity","350 seats"],["Monthly charges","₹ 6,500 (room + mess)"],["Warden contact","+91 99887 76655"],["Application","Apply via portal by June 30"]],
+    rule:"RULE_14: /hostel|accommodation|dormitory/"
+  },
+  {
+    id:"placement",
+    category:"facilities",
+    patterns:[/placement/i,/campus.*recruit/i,/job.*offer/i,/compan.*visit/i,/career\s*cell/i,/internship/i,/tnp/i],
+    answer:"Training & Placement Cell",
+    type:"table",
+    data:[["Location","Room 301, New Block"],["Contact","+91 97000 11223"],["Email","placement@institute.edu"],["2023 avg package","₹ 6.8 LPA"],["2023 highest offer","₹ 24 LPA"],["Companies visiting (2024)","120+"]],
+    rule:"RULE_15: /placement|campus recruit|internship/"
+  }
+];
+
+function matchRule(text){
+  const t=text.trim();
+  for(const rule of RULES){
+    for(const pat of rule.patterns){
+      if(pat.test(t))return rule;
+    }
+  }
+  return null;
+}
+
+function formatAnswer(rule){
+  let html="<strong>"+rule.answer+"</strong>";
+  if(rule.type==="table"){
+    html+="<table>";
+    rule.data.forEach(([k,v])=>{html+=`<tr><td>${k}</td><td style="font-weight:500;color:var(--color-text-primary)">${v}</td></tr>`;});
+    html+="</table>";
+  }else if(rule.type==="text"){
+    html+=`<div style="margin-top:6px;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6">${rule.text}</div>`;
+  }
+  html+=`<div class="rule-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>${rule.rule}</div>`;
+  return html;
+}
+
+function relatedChips(matchedId){
+  const cats={timings:["What are the college timings?","When does the library open?","What time does the canteen open?"],fees:["What is the tuition fee?","When is the fee due date?","Is there a fee refund policy?"],contacts:["What is the exam cell contact?","Who is the principal?","How to reach student support?"],academic:["When does the semester start?","What is the attendance requirement?"],facilities:["Is hostel available?","Is there a placement cell?"]};
+  const matched=RULES.find(r=>r.id===matchedId);
+  if(!matched)return[];
+  return(cats[matched.category]||[]).filter(q=>{const r=RULES.find(x=>x.id!==matchedId&&x.patterns.some(p=>p.test(q)));return!!r;}).slice(0,3);
+}
+
+function fallbackCard(text){
+  const words=text.toLowerCase().split(/\s+/);
+  const suggestions=RULES.filter(r=>r.patterns.some(p=>words.some(w=>w.length>3&&p.source.toLowerCase().includes(w)))).slice(0,3);
+  let html=`<div style="font-size:13px;color:var(--color-text-secondary)">I don't have a specific answer for that. Here are some related topics I can help with:</div>`;
+  if(suggestions.length){
+    html+=`<div class="fallback-card"><div class="fc-hdr"><svg style="width:12px;height:12px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>Did you mean?</div><div class="fc-body">`;
+    suggestions.forEach(r=>{
+      const catColor={timings:"#185FA5",fees:"#3B6D11",contacts:"#854F0B",academic:"#534AB7",facilities:"#993C1D"};
+      const sample=r.patterns[0].source.replace(/\\/g,"").replace(/[()[\]?]/g,"").replace(/\|.*/,"").trim();
+      html+=`<div class="fc-row" onclick="send('${r.answer}')"><div style="width:6px;height:6px;border-radius:50%;background:${catColor[r.category]||"#888"};flex-shrink:0"></div>${r.answer}</div>`;
+    });
+    html+="</div></div>";
+  }else{
+    html+=`<div class="chip-row">`;
+    ["college timings","fee structure","exam cell contact","attendance policy"].forEach(q=>{html+=`<span class="chip" onclick="send('${q}')">${q}</span>`;});
+    html+="</div>";
+  }
+  return html;
+}
+
+function updateRuleBadge(rule){
+  document.getElementById("rule-text").textContent=rule?`Matched: ${rule.rule}`:"No rule matched — showing fallback suggestions";
+}
+
+function updateStats(){
+  document.getElementById("stat-matched").textContent=matched;
+  document.getElementById("stat-fallback").textContent=fallbacks;
+  document.getElementById("stat-total").textContent=total;
+}
+
+function addMsg(role,html,extras){
+  const c=document.getElementById("msgs");
+  const row=document.createElement("div");row.className="row"+(role==="user"?" user":"");
+  const av=document.createElement("div");av.className="av "+role;av.textContent=role==="bot"?"AI":"U";
+  const bub=document.createElement("div");bub.className="bub "+role;bub.innerHTML=html;
+  if(extras&&extras.chips&&extras.chips.length){
+    const cr=document.createElement("div");cr.className="chip-row";
+    extras.chips.forEach(q=>{const s=document.createElement("span");s.className="chip";s.textContent=q.replace(/\?$/,"");s.onclick=()=>send(q);cr.appendChild(s);});
+    bub.appendChild(cr);
+  }
+  row.appendChild(av);row.appendChild(bub);c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+
+function showTyping(){
+  const c=document.getElementById("msgs");
+  const row=document.createElement("div");row.className="row";row.id="typ";
+  const av=document.createElement("div");av.className="av bot";av.textContent="AI";
+  const bub=document.createElement("div");bub.className="bub bot";
+  bub.innerHTML='<div class="dot-anim"><div class="dt"></div><div class="dt"></div><div class="dt"></div></div>';
+  row.appendChild(av);row.appendChild(bub);c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function removeTyping(){const e=document.getElementById("typ");if(e)e.remove();}
+
+async function send(preset){
+  const inp=document.getElementById("inp");const btn=document.getElementById("sbtn");
+  const text=(preset||inp.value).trim();if(!text)return;
+  inp.value="";btn.disabled=true;
+  addMsg("user",text,null);
+  showTyping();
+  total++;
+
+  await new Promise(r=>setTimeout(r,320+Math.random()*280));
+  removeTyping();
+
+  const rule=matchRule(text);
+  updateRuleBadge(rule);
+
+  if(rule){
+    matched++;
+    const chips=relatedChips(rule.id);
+    addMsg("bot",formatAnswer(rule),{chips});
+  }else{
+    fallbacks++;
+    addMsg("bot",fallbackCard(text),null);
+  }
+  updateStats();
+  btn.disabled=false;inp.focus();
+}
+
+document.getElementById("inp").addEventListener("keydown",e=>{if(e.key==="Enter")send();});
+
+addMsg("bot",`<strong>Welcome to the Institute Info Bot</strong><div style="margin-top:6px;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6">I can answer 15 fixed institute FAQs using rule-based pattern matching — no AI needed. Ask about timings, fees, contacts, academic rules, or facilities.</div><div class="chip-row"><span class="chip" onclick="send('college timings')">Timings</span><span class="chip" onclick="send('fee structure')">Fee structure</span><span class="chip" onclick="send('exam cell')">Exam cell</span><span class="chip" onclick="send('attendance')">Attendance</span></div>`,null);
+</script>
