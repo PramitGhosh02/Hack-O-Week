@@ -1,0 +1,317 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#root{font-family:var(--font-sans);display:flex;flex-direction:column;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+#layout{display:flex;min-height:580px}
+/* chat col */
+#chat-col{flex:1;display:flex;flex-direction:column;border-right:0.5px solid var(--color-border-tertiary);min-width:0}
+#ch{padding:10px 14px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:9px}
+.cav{width:28px;height:28px;border-radius:50%;background:#185FA5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#E6F1FB;flex-shrink:0}
+#ch h2{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+#ch p{font-size:11px;color:var(--color-text-secondary)}
+#msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:6px;align-items:flex-end}
+.row.u{flex-direction:row-reverse}
+.av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;flex-shrink:0}
+.av.b{background:#185FA5;color:#E6F1FB}
+.av.u{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.bub{max-width:84%;padding:8px 12px;border-radius:13px;font-size:12.5px;line-height:1.57;color:var(--color-text-primary)}
+.bub.b{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-bottom-left-radius:3px}
+.bub.u{background:#185FA5;color:#E6F1FB;border-bottom-right-radius:3px}
+.intent-badge{display:inline-flex;align-items:center;gap:5px;margin-top:7px;padding:4px 10px;border-radius:8px;font-size:11.5px;font-weight:500}
+.conf-row{display:flex;align-items:center;gap:7px;margin-top:5px}
+.conf-label{font-size:10.5px;color:var(--color-text-tertiary);white-space:nowrap}
+.conf-track{flex:1;height:3px;border-radius:99px;background:var(--color-border-tertiary);overflow:hidden}
+.conf-fill{height:100%;border-radius:99px}
+.conf-val{font-size:10.5px;font-weight:500;min-width:32px;text-align:right}
+.all-scores{margin-top:8px;display:flex;flex-direction:column;gap:3px}
+.as-row{display:flex;align-items:center;gap:6px}
+.as-name{font-size:10.5px;color:var(--color-text-secondary);min-width:80px;font-weight:500}
+.as-bar{flex:1;height:4px;border-radius:99px;background:var(--color-border-tertiary);overflow:hidden;min-width:40px}
+.as-fill{height:100%;border-radius:99px}
+.as-val{font-size:10px;color:var(--color-text-tertiary);min-width:24px;text-align:right;font-family:var(--font-mono)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.chip{font-size:11px;padding:2px 8px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+.chip:hover{border-color:#185FA5;color:#185FA5}
+#inp-area{padding:9px 12px;border-top:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;gap:6px}
+#qrow{display:flex;gap:5px;flex-wrap:wrap}
+.qc{font-size:11px;padding:2px 8px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+.qc:hover{border-color:#185FA5;color:#185FA5}
+#irow{display:flex;gap:7px;align-items:center}
+#inp{flex:1;padding:7px 12px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:12.5px;outline:none}
+#inp:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,.1)}
+#sbtn{width:30px;height:30px;border-radius:50%;border:none;background:#185FA5;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#sbtn:hover{background:#0C447C}
+#sbtn:disabled{background:var(--color-border-tertiary);cursor:default}
+/* right panel */
+#rp{width:290px;flex-shrink:0;display:flex;flex-direction:column}
+#rph{padding:10px 13px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+#rph h2{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+#rph p{font-size:11px;color:var(--color-text-secondary)}
+/* intent index */
+#intent-index{padding:10px 12px;display:flex;flex-direction:column;gap:7px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ii-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 10px;cursor:pointer;transition:border-color .15s}
+.ii-card:hover{border-color:var(--color-border-secondary)}
+.ii-card.active{border-width:1.5px}
+.ii-top{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.ii-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ii-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.ii-count{margin-left:auto;font-size:10.5px;font-family:var(--font-mono);color:var(--color-text-tertiary)}
+.ii-kw{font-size:10.5px;color:var(--color-text-secondary);line-height:1.4;font-family:var(--font-mono)}
+/* stats */
+#stats-strip{padding:8px 13px;display:flex;gap:10px;flex-wrap:wrap;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.ss{font-size:11px;color:var(--color-text-secondary)}.ss b{color:var(--color-text-primary);font-weight:500}
+/* chart */
+#chart-section{padding:10px 12px;border-top:0.5px solid var(--color-border-tertiary);flex:1}
+#chart-section p{font-size:11px;color:var(--color-text-secondary);margin-bottom:6px}
+/* typing */
+.dt{width:5px;height:5px;border-radius:50%;background:var(--color-text-secondary);animation:bop 1.2s infinite;opacity:.4;display:inline-block}
+.dt:nth-child(2){animation-delay:.2s}.dt:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+</style>
+
+<div id="root">
+<div id="layout">
+ <div id="chat-col">
+  <div id="ch">
+   <div class="cav">AI</div>
+   <div><h2>Intent-routing chatbot</h2><p>Naive Bayes · 7 intents · 140 training examples</p></div>
+   <div style="margin-left:auto;display:flex;align-items:center;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#639922"></div><span style="font-size:11px;color:var(--color-text-secondary)">Trained</span></div>
+  </div>
+  <div id="msgs"></div>
+  <div id="inp-area">
+   <div id="qrow">
+    <button class="qc" onclick="go('what documents do I need for admission')">admission docs</button>
+    <button class="qc" onclick="go('when is the semester exam schedule')">exam schedule</button>
+    <button class="qc" onclick="go('show me the class timetable')">timetable</button>
+    <button class="qc" onclick="go('how to apply for hostel room')">hostel room</button>
+    <button class="qc" onclick="go('scholarship eligibility criteria')">scholarship</button>
+    <button class="qc" onclick="go('fee payment deadline and late fine')">fee payment</button>
+    <button class="qc" onclick="go('contact placement cell for job')">placement</button>
+   </div>
+   <div id="irow">
+    <input id="inp" type="text" placeholder="Ask any student question…" autocomplete="off"/>
+    <button id="sbtn" onclick="go()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg></button>
+   </div>
+  </div>
+ </div>
+ <div id="rp">
+  <div id="rph"><h2>Intent index</h2><p>7 classes · click to explore</p></div>
+  <div id="intent-index"></div>
+  <div id="stats-strip">
+   <span class="ss">Total queries: <b id="s-total">0</b></span>
+   <span class="ss">Accuracy: <b id="s-acc">—</b></span>
+   <span class="ss">Low-conf: <b id="s-lowconf">0</b></span>
+  </div>
+  <div id="chart-section">
+   <p>Queries per intent (session)</p>
+   <div style="position:relative;height:160px"><canvas id="dist-chart" role="img" aria-label="Bar chart showing query distribution across 7 intent classes">Query distribution across intent classes.</canvas></div>
+  </div>
+ </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+/* ── INTENT DEFINITIONS ── */
+const INTENTS=[
+ {
+  id:"admissions",label:"Admissions",color:"#185FA5",bg:"#E6F1FB",text:"#0C447C",
+  desc:"Admission process, eligibility, documents, application",
+  response:"For admissions: Applications open March 1–April 30 on admission.institute.edu. Required documents: 10th & 12th marksheets, transfer certificate, ID proof, passport photo, and category certificate (if applicable). Entrance exam cutoffs are published after May 15. Contact: admissions@institute.edu or +91 98000 11100.",
+  examples:["how to apply for admission","what are the eligibility criteria for admission","admission process for engineering","required documents for college admission","application form for new admission","cutoff marks for admission","entrance exam for admission","admission last date","how to get admission in btech","admission open for this year","when is admission process starting","what is the procedure for fresh admission","documents needed for admission","is admission open","college admission requirements","merit list for admission","confirm my admission","admission status check","direct admission available","management quota admission"]
+ },
+ {
+  id:"exams",label:"Exams",color:"#3B6D11",bg:"#EAF3DE",text:"#27500A",
+  desc:"Exam schedule, hall ticket, results, revaluation",
+  response:"Exam info: Semester timetables are released 3 weeks before exams on portal.institute.edu/exams. Hall tickets are available 7 days prior — download from the student portal. Results are published within 30 days post-exam. For revaluation, submit the form within 10 days of results with ₹500/subject fee to the exam cell (examcell@institute.edu).",
+  examples:["when is the exam schedule","download hall ticket","exam timetable for semester","revaluation form for exam","supplementary exam registration","exam date sheet","when are results declared","how to check exam result","hall ticket not downloaded","exam paper date","backlog exam when","grace marks for exam","internal exam marks","external examination details","exam cell contact","model question paper","previous year exam papers","exam pattern marks distribution","practical exam schedule","viva examination date"]
+ },
+ {
+  id:"timetable",label:"Timetable",color:"#534AB7",bg:"#EEEDFE",text:"#3C3489",
+  desc:"Class schedule, lecture timing, faculty periods",
+  response:"Class timetables are published on the student portal at the start of each semester. You can view your branch-wise schedule at portal.institute.edu/timetable. Lab periods and elective slots are listed separately. Changes due to holidays or rescheduled lectures are notified via the department notice board and student email.",
+  examples:["show class timetable","lecture schedule for today","what time is my class","period schedule for branch","when is the next lecture","timetable for sem 3 cse","faculty teaching schedule","lab schedule this week","class timing monday to friday","when is physics class","show me the weekly schedule","morning batch timetable","timetable change notification","rescheduled class information","elective class timing","theory and lab schedule","class timetable pdf download","who teaches this subject","what is the free period","slot for cs theory class"]
+ },
+ {
+  id:"hostel",label:"Hostel",color:"#993C1D",bg:"#FAECE7",text:"#712B13",
+  desc:"Hostel accommodation, room, mess, warden, charges",
+  response:"Hostel details: Boys (450 seats) and Girls (350 seats) hostels are available. Monthly charges: ₹6,500 including mess. Apply by June 30 via portal.institute.edu/hostel — allocation is on a first-come basis. Room allotment letters are issued in July. Warden contact: +91 99887 76655. Complaints and maintenance requests go to warden@institute.edu.",
+  examples:["how to apply for hostel","hostel room allotment","hostel fees per month","hostel application form","is hostel available for girls","hostel accommodation procedure","room allocation in hostel","hostel mess food timing","hostel warden contact","hostel rules and regulations","hostel check-in checkout time","apply for hostel this year","hostel waiting list","hostel transfer request","single room in hostel","hostel charges breakdown","outpass from hostel","hostel maintenance complaint","hostel wifi availability","change hostel room request"]
+ },
+ {
+  id:"scholarships",label:"Scholarships",color:"#854F0B",bg:"#FAEEDA",text:"#633806",
+  desc:"Scholarship eligibility, application, merit, government schemes",
+  response:"Scholarship options: (1) Merit scholarship — top 5% of each branch, automatic, no application needed. (2) Government schemes — SC/ST/OBC/EWS scholarships via scholarship.gov.in, apply by August 31. (3) Sports & cultural quota — apply via dean's office with certificates. (4) Institute need-based aid — apply to the financial assistance committee with income proof. Contact: scholarship@institute.edu.",
+  examples:["how to apply for scholarship","scholarship eligibility criteria","government scholarship for sc st","merit scholarship criteria","need based scholarship application","scholarship last date","scholarship amount per year","sports scholarship available","scholarship for obc students","minority scholarship apply","scholarship renewal process","income certificate for scholarship","scholarship status check","which scholarship am i eligible for","scholarship application rejected","new scholarship schemes","scholarship disbursement date","scholarship for first year students","scholarship form submission","national scholarship portal apply"]
+ },
+ {
+  id:"fees",label:"Fees",color:"#A32D2D",bg:"#FCEBEB",text:"#791F1F",
+  desc:"Tuition fee, payment, receipt, due date, refund, fine",
+  response:"Fee structure (per semester): Tuition ₹42,500 | Development ₹5,000 | Lab ₹3,000 | Exam ₹1,500 = Total ₹52,000. Payment is due within the first 15 days of semester start. Late fine: ₹100/day thereafter. Pay online at portal.institute.edu/fees (UPI, net banking, debit/credit card). Refund policy: 100% before start, 75% within 15 days, 50% days 16–30, nil after.",
+  examples:["how much is the tuition fee","fee payment deadline","last date to pay fees","fee receipt download","late fine for fee payment","online fee payment portal","semester fee structure","fee refund policy","pending fee dues","fee concession application","hostel fee charges","exam fee payment","fee waiver request","pay fee using upi","net banking fee payment","fee payment confirmation","annual fee for btech","installment for fee payment","total fee for whole course","fee challan generation"]
+ },
+ {
+  id:"placement",label:"Placement",color:"#0F6E56",bg:"#E1F5EE",text:"#085041",
+  desc:"Campus placement, job offers, companies, packages, internship",
+  response:"Placement Cell (Room 301, New Block): Phone +91 97000 11223 | Email placement@institute.edu. 2023 stats: 94% placement rate, average package ₹6.8 LPA, highest ₹24 LPA, 120+ companies visited. Pre-placement training starts in SEM 6. Internship opportunities are listed on the portal. Register for placement drives at portal.institute.edu/placement.",
+  examples:["placement cell details","campus recruitment process","average package offered","which companies visit campus","how to register for placement","placement training schedule","internship opportunities","off campus placement help","placement statistics this year","minimum criteria for placement","when do companies start hiring","placement cell contact number","job offer from campus","highest package this year","placement drive this month","how to prepare for placement","aptitude test for placement","hr interview tips","placement percentage","mnc companies placement"]
+ }
+];
+
+/* ── STOP WORDS ── */
+const STOP=new Set(["a","an","the","is","are","was","were","be","been","have","has","do","does","did","will","would","could","should","may","might","i","me","my","we","you","your","he","she","it","they","them","this","that","of","in","on","at","to","for","with","by","from","as","and","or","but","if","when","how","what","which","who","not","any","all","some","very","just","also","get","can","need","want","please","tell","know","show","give","sir","hi","hello","dear"]);
+
+function tokenize(t){
+  return t.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>1&&!STOP.has(w));
+}
+
+/* ── NAIVE BAYES CLASSIFIER ── */
+class NaiveBayes{
+  constructor(){this.priors={};this.likelihoods={};this.vocab=new Set();this.total=0;}
+  train(examples,label){
+    this.priors[label]=(this.priors[label]||0)+examples.length;
+    this.total+=examples.length;
+    if(!this.likelihoods[label])this.likelihoods[label]={};
+    examples.forEach(ex=>{
+      tokenize(ex).forEach(t=>{
+        this.vocab.add(t);
+        this.likelihoods[label][t]=(this.likelihoods[label][t]||0)+1;
+      });
+    });
+  }
+  classify(text){
+    const toks=tokenize(text);
+    const V=this.vocab.size;
+    const scores={};
+    Object.keys(this.priors).forEach(label=>{
+      const prior=Math.log(this.priors[label]/this.total);
+      const totalTerms=Object.values(this.likelihoods[label]).reduce((s,v)=>s+v,0);
+      const logLik=toks.reduce((s,t)=>{
+        const count=(this.likelihoods[label][t]||0)+1;
+        return s+Math.log(count/(totalTerms+V));
+      },0);
+      scores[label]=prior+logLik;
+    });
+    /* convert log scores to probabilities via softmax */
+    const vals=Object.values(scores);
+    const maxVal=Math.max(...vals);
+    const exps={};let sumExp=0;
+    Object.keys(scores).forEach(k=>{exps[k]=Math.exp(scores[k]-maxVal);sumExp+=exps[k];});
+    const probs={};Object.keys(exps).forEach(k=>{probs[k]=exps[k]/sumExp;});
+    const sorted=Object.entries(probs).sort((a,b)=>b[1]-a[1]);
+    return{top:sorted[0],all:sorted,probs};
+  }
+}
+
+const nb=new NaiveBayes();
+INTENTS.forEach(i=>nb.train(i.examples,i.id));
+
+/* ── INTENT INDEX ── */
+const intentMap={};INTENTS.forEach(i=>{intentMap[i.id]=i;});
+const sessionCounts={};INTENTS.forEach(i=>{sessionCounts[i.id]=0;});
+let totalQ=0,lowConf=0;
+
+function buildIndex(){
+  const panel=document.getElementById('intent-index');
+  panel.innerHTML='';
+  INTENTS.forEach(intent=>{
+    const card=document.createElement('div');
+    card.className='ii-card';card.id='ii-'+intent.id;
+    card.innerHTML=`<div class="ii-top"><div class="ii-dot" style="background:${intent.color}"></div><span class="ii-name">${intent.label}</span><span class="ii-count" id="cnt-${intent.id}">0</span></div><div class="ii-kw">${intent.desc}</div>`;
+    panel.appendChild(card);
+  });
+}
+buildIndex();
+
+/* ── CHART ── */
+let distChart=null;
+function buildChart(){
+  if(distChart)distChart.destroy();
+  const labels=INTENTS.map(i=>i.label);
+  const data=INTENTS.map(i=>sessionCounts[i.id]);
+  const colors=INTENTS.map(i=>i.color);
+  distChart=new Chart(document.getElementById('dist-chart'),{
+    type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:3,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},autoSkip:false,maxRotation:35}},y:{ticks:{font:{size:10},stepSize:1},beginAtZero:true}}}
+  });
+}
+buildChart();
+
+function updateStats(intentId){
+  sessionCounts[intentId]++;
+  totalQ++;
+  document.getElementById('s-total').textContent=totalQ;
+  document.getElementById('s-acc').textContent=Math.round((totalQ-lowConf)/Math.max(totalQ,1)*100)+'%';
+  document.getElementById('s-lowconf').textContent=lowConf;
+  document.getElementById('cnt-'+intentId).textContent=sessionCounts[intentId];
+  INTENTS.forEach(i=>{const el=document.getElementById('ii-'+i.id);if(el)el.classList.remove('active');});
+  const ac=document.getElementById('ii-'+intentId);
+  if(ac){ac.classList.add('active');ac.style.borderColor=intentMap[intentId].color;}
+  buildChart();
+}
+
+/* ── MESSAGES ── */
+function addMsg(role,html){
+  const c=document.getElementById('msgs');
+  const row=document.createElement('div');row.className='row '+(role==='u'?'u':'');
+  const av=document.createElement('div');av.className='av '+(role==='u'?'u':'b');av.textContent=role==='u'?'U':'AI';
+  const bub=document.createElement('div');bub.className='bub '+(role==='u'?'u':'b');bub.innerHTML=html;
+  row.appendChild(av);row.appendChild(bub);c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  const c=document.getElementById('msgs');const r=document.createElement('div');r.className='row';r.id='typ';
+  const av=document.createElement('div');av.className='av b';av.textContent='AI';
+  const bub=document.createElement('div');bub.className='bub b';bub.innerHTML='<div style="display:flex;gap:3px;padding:2px 0"><div class="dt"></div><div class="dt"></div><div class="dt"></div></div>';
+  r.appendChild(av);r.appendChild(bub);c.appendChild(r);c.scrollTop=c.scrollHeight;
+}
+function removeTyping(){const e=document.getElementById('typ');if(e)e.remove();}
+
+const CONF_THRESHOLD=0.30;
+
+async function go(preset){
+  const inp=document.getElementById('inp');const btn=document.getElementById('sbtn');
+  const q=(preset||inp.value).trim();if(!q)return;
+  inp.value='';btn.disabled=true;
+  addMsg('u',q);
+  showTyping();
+  await new Promise(r=>setTimeout(r,300+Math.random()*280));
+  removeTyping();
+
+  const result=nb.classify(q);
+  const topId=result.top[0];
+  const topProb=result.top[1];
+  const intent=intentMap[topId];
+  const isLow=topProb<CONF_THRESHOLD;
+  if(isLow)lowConf++;
+  updateStats(topId);
+
+  /* build all-scores bar */
+  const allBars=result.all.map(([id,prob])=>{
+    const it=intentMap[id];
+    const pct=Math.round(prob*100);
+    return `<div class="as-row"><span class="as-name">${it.label}</span><div class="as-bar"><div class="as-fill" style="width:${pct}%;background:${it.color}"></div></div><span class="as-val">${pct}%</span></div>`;
+  }).join('');
+
+  let html='';
+  if(isLow){
+    html=`<span style="font-size:12.5px;color:var(--color-text-secondary)">I'm not fully confident about your intent (best match: ${Math.round(topProb*100)}%). Could you rephrase? Or pick a topic:</span>`;
+    html+=`<div class="chips">${INTENTS.map(i=>`<span class="chip" onclick="go('${i.examples[0]}')" style="border-color:${i.color};color:${i.text};background:${i.bg}">${i.label}</span>`).join('')}</div>`;
+  }else{
+    html=`<div class="intent-badge" style="background:${intent.bg};color:${intent.text}">${intent.label}</div>`;
+    html+=`<div style="margin-top:7px;font-size:12.5px;color:var(--color-text-primary);line-height:1.6">${intent.response}</div>`;
+    html+=`<div class="conf-row"><span class="conf-label">Confidence</span><div class="conf-track"><div class="conf-fill" style="width:${Math.min(topProb*140,100)}%;background:${intent.color}"></div></div><span class="conf-val" style="color:${intent.color}">${Math.round(topProb*100)}%</span></div>`;
+    if(result.all.length>1&&result.all[1][1]>0.08){
+      html+=`<div style="margin-top:7px;font-size:10.5px;color:var(--color-text-tertiary);margin-bottom:3px">All intent scores</div>`;
+      html+=`<div class="all-scores">${allBars}</div>`;
+    }
+  }
+  addMsg('b',html);
+  btn.disabled=false;inp.focus();
+}
+
+document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+addMsg('b',`Multinomial Naive Bayes classifier trained on <strong>140 labelled examples</strong> across 7 intents. Each query is tokenised, stop words removed, and scored with log-prior + log-likelihood per class. Softmax converts scores to probabilities. The highest-probability intent routes your query to the correct answer.
+<div class="chips">${INTENTS.map(i=>`<span class="chip" style="border-color:${i.color};color:${i.text};background:${i.bg}" onclick="go('${i.examples[0]}')">${i.label}</span>`).join('')}</div>`);
+</script>
