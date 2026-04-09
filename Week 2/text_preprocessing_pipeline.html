@@ -1,0 +1,365 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#root{font-family:var(--font-sans);display:flex;flex-direction:column;gap:0;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+
+/* top: split view */
+#top-split{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary)}
+
+/* left: live chat */
+#chat-col{flex:1;display:flex;flex-direction:column;min-width:0;border-right:0.5px solid var(--color-border-tertiary)}
+#chat-hdr{padding:10px 14px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:9px}
+.chat-av{width:28px;height:28px;border-radius:50%;background:#185FA5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#E6F1FB;flex-shrink:0}
+#chat-hdr h2{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+#chat-hdr p{font-size:11px;color:var(--color-text-secondary)}
+#msgs{height:280px;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:6px;align-items:flex-end}
+.row.user{flex-direction:row-reverse}
+.av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;flex-shrink:0}
+.av.bot{background:#185FA5;color:#E6F1FB}
+.av.user{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.bub{max-width:82%;padding:7px 11px;border-radius:12px;font-size:12.5px;line-height:1.55;color:var(--color-text-primary)}
+.bub.bot{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-bottom-left-radius:3px}
+.bub.user{background:#185FA5;color:#E6F1FB;border-bottom-right-radius:3px}
+#inp-area{padding:9px 12px;border-top:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;gap:6px}
+#inp-row{display:flex;gap:7px;align-items:center}
+#inp{flex:1;padding:7px 12px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:12.5px;outline:none}
+#inp:focus{border-color:#378ADD;box-shadow:0 0 0 2px rgba(55,138,221,.1)}
+#sbtn{width:30px;height:30px;border-radius:50%;border:none;background:#185FA5;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#sbtn:hover{background:#0C447C}
+#sbtn:disabled{background:var(--color-border-tertiary);cursor:default}
+.qchips{display:flex;gap:4px;flex-wrap:wrap}
+.qc{font-size:11px;padding:2px 8px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+.qc:hover{border-color:#185FA5;color:#185FA5}
+
+/* right: pipeline panel */
+#pipe-col{width:340px;flex-shrink:0;display:flex;flex-direction:column;background:var(--color-background-primary)}
+#pipe-hdr{padding:10px 14px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px}
+#pipe-hdr h2{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+#pipe-hdr p{font-size:11px;color:var(--color-text-secondary)}
+#pipe-steps{padding:12px 12px;display:flex;flex-direction:column;gap:8px;height:380px;overflow-y:auto}
+.step-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;transition:border-color .2s}
+.step-card.active{border-color:transparent}
+.step-hdr{padding:7px 11px;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500}
+.step-num{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.step-body{padding:7px 11px;background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary)}
+.step-label{font-size:10px;color:var(--color-text-tertiary);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.step-val{font-size:12px;font-family:var(--font-mono);color:var(--color-text-primary);line-height:1.5;word-break:break-all}
+.token-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.tok{padding:2px 6px;border-radius:4px;font-size:11px;font-family:var(--font-mono);font-weight:500}
+.tok.kept{background:#E6F1FB;color:#0C447C}
+.tok.removed{background:#FCEBEB;color:#A32D2D;text-decoration:line-through;opacity:.7}
+.tok.normalized{background:#EAF3DE;color:#27500A}
+.tok.spell{background:#EEEDFE;color:#3C3489}
+.tok.punct{background:#FAEEDA;color:#633806}
+.step-idle{font-size:11.5px;color:var(--color-text-tertiary);font-style:italic;padding:4px 0}
+
+/* step colours */
+.s1 .step-hdr{background:#E6F1FB}.s1 .step-num{background:#185FA5;color:#E6F1FB}.s1 .step-hdr span{color:#0C447C}
+.s2 .step-hdr{background:#FAEEDA}.s2 .step-num{background:#854F0B;color:#FAEEDA}.s2 .step-hdr span{color:#633806}
+.s3 .step-hdr{background:#FCEBEB}.s3 .step-num{background:#A32D2D;color:#FCEBEB}.s3 .step-hdr span{color:#791F1F}
+.s4 .step-hdr{background:#EAF3DE}.s4 .step-num{background:#3B6D11;color:#EAF3DE}.s4 .step-hdr span{color:#27500A}
+.s5 .step-hdr{background:#EEEDFE}.s5 .step-num{background:#534AB7;color:#EEEDFE}.s5 .step-hdr span{color:#3C3489}
+
+.step-card.active.s1{border-color:#378ADD}
+.step-card.active.s2{border-color:#EF9F27}
+.step-card.active.s3{border-color:#E24B4A}
+.step-card.active.s4{border-color:#639922}
+.step-card.active.s5{border-color:#7F77DD}
+
+/* bottom: token legend + stats */
+#bottom-bar{padding:10px 16px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--color-text-secondary)}
+.leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+#stats-row{margin-left:auto;display:flex;gap:12px}
+.stat{font-size:11px;color:var(--color-text-secondary)}.stat b{color:var(--color-text-primary);font-weight:500}
+
+.dot-anim{display:flex;gap:3px;align-items:center;padding:2px 0}
+.dt{width:4px;height:4px;border-radius:50%;background:var(--color-text-secondary);animation:bop 1.2s infinite;opacity:.4}
+.dt:nth-child(2){animation-delay:.2s}.dt:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+</style>
+
+<div id="root">
+  <div id="top-split">
+
+    <div id="chat-col">
+      <div id="chat-hdr">
+        <div class="chat-av">AI</div>
+        <div>
+          <h2>Student Query Bot</h2>
+          <p>With live NLP preprocessing</p>
+        </div>
+      </div>
+      <div id="msgs"></div>
+      <div id="inp-area">
+        <div class="qchips">
+          <button class="qc" onclick="go('Whn is da SEM5 cs EXAM??')">Whn is da SEM5 cs EXAM??</button>
+          <button class="qc" onclick="go('wat r d fee detials fr 3rd yr???')">wat r d fee detials fr 3rd yr???</button>
+          <button class="qc" onclick="go('PLZ tell me ATTENDENCE % requirment!!')">PLZ tell ATTENDENCE % requirment!!</button>
+          <button class="qc" onclick="go('how 2 get hall tiket 4 exm')">how 2 get hall tiket 4 exm</button>
+          <button class="qc" onclick="go('libary open time on sunday??')">libary open time on sunday??</button>
+        </div>
+        <div id="inp-row">
+          <input id="inp" type="text" placeholder="Type a messy student query to see preprocessing…" autocomplete="off"/>
+          <button id="sbtn" onclick="go()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pipe-col">
+      <div id="pipe-hdr">
+        <svg style="width:14px;height:14px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <div><h2>Preprocessing pipeline</h2><p>5 stages · runs on every message</p></div>
+      </div>
+      <div id="pipe-steps">
+        <div class="step-card s1" id="s1">
+          <div class="step-hdr"><div class="step-num">1</div><span>Lowercasing</span></div>
+          <div class="step-body"><div class="step-idle">Waiting for input…</div></div>
+        </div>
+        <div class="step-card s2" id="s2">
+          <div class="step-hdr"><div class="step-num">2</div><span>Punctuation &amp; noise removal</span></div>
+          <div class="step-body"><div class="step-idle">Waiting for input…</div></div>
+        </div>
+        <div class="step-card s3" id="s3">
+          <div class="step-hdr"><div class="step-num">3</div><span>Tokenization</span></div>
+          <div class="step-body"><div class="step-idle">Waiting for input…</div></div>
+        </div>
+        <div class="step-card s4" id="s4">
+          <div class="step-hdr"><div class="step-num">4</div><span>Stop word removal</span></div>
+          <div class="step-body"><div class="step-idle">Waiting for input…</div></div>
+        </div>
+        <div class="step-card s5" id="s5">
+          <div class="step-hdr"><div class="step-num">5</div><span>Spelling normalization</span></div>
+          <div class="step-body"><div class="step-idle">Waiting for input…</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottom-bar">
+    <div class="leg"><div class="leg-sq" style="background:#E6F1FB;border:0.5px solid #378ADD"></div>kept token</div>
+    <div class="leg"><div class="leg-sq" style="background:#FCEBEB;border:0.5px solid #E24B4A"></div>stop word removed</div>
+    <div class="leg"><div class="leg-sq" style="background:#EAF3DE;border:0.5px solid #639922"></div>punctuation stripped</div>
+    <div class="leg"><div class="leg-sq" style="background:#EEEDFE;border:0.5px solid #7F77DD"></div>spelling corrected</div>
+    <div id="stats-row">
+      <span class="stat">Processed: <b id="st-total">0</b></span>
+      <span class="stat">Tokens kept: <b id="st-kept">—</b></span>
+      <span class="stat">Corrections: <b id="st-corr">0</b></span>
+    </div>
+  </div>
+</div>
+
+<script>
+const STOP_WORDS=new Set(["a","an","the","is","are","was","were","be","been","being","have","has","had","do","does","did","will","would","could","should","may","might","shall","can","need","dare","ought","used","i","me","my","we","our","us","you","your","he","she","it","they","them","their","this","that","these","those","of","in","on","at","to","for","with","by","from","as","into","through","about","against","between","into","during","before","after","above","below","up","down","out","off","over","under","again","then","once","here","there","when","where","why","how","all","both","each","few","more","most","other","some","such","no","nor","not","only","same","so","than","too","very","just","because","but","or","and","if","while","although","though","however","tell","please","plz","pls","sir","maam","ma","hello","hi","hey","hii","r","d","da","2","4","wat","wht","whn","hw"]);
+
+const SPELL_MAP={
+  "exm":"exam","exams":"exams","exm":"exam","attandance":"attendance","attendence":"attendance","attendace":"attendance","atendance":"attendance",
+  "semster":"semester","semestre":"semester","semster":"semester","semeseter":"semester",
+  "tiket":"ticket","tiecket":"ticket","tickt":"ticket","hall":"hall",
+  "libary":"library","libaray":"library","libreary":"library","liberary":"library",
+  "detials":"details","detals":"details","deatils":"details","detilas":"details",
+  "requirment":"requirement","requiremnt":"requirement","requiremet":"requirement",
+  "colege":"college","collge":"college","colleje":"college",
+  "schdule":"schedule","shcedule":"schedule","scheduel":"schedule",
+  "sylabus":"syllabus","syllbus":"syllabus","sylabbus":"syllabus",
+  "reslt":"result","resullt":"result","rezult":"result",
+  "atendence":"attendance","attendence":"attendance",
+  "practcal":"practical","practcal":"practical","practicle":"practical",
+  "feee":"fee","fess":"fees","fese":"fees",
+  "certficate":"certificate","certificat":"certificate",
+  "submition":"submission","submssion":"submission",
+  "admision":"admission","admisson":"admission",
+  "timetble":"timetable","timetabel":"timetable","timtable":"timetable",
+  "hostal":"hostel","hosel":"hostel","hostl":"hostel",
+  "placment":"placement","placemnt":"placement",
+  "pricipal":"principal","prinicpal":"principal",
+  "departmnt":"department","deparment":"department",
+  "assignmnt":"assignment","assgnment":"assignment",
+  "proejct":"project","peoject":"project",
+  "internl":"internal","internel":"internal",
+  "infomation":"information","informatin":"information",
+  "avaliable":"available","availble":"available",
+  "revalution":"revaluation","revaluaton":"revaluation",
+  "suplementary":"supplementary","supplmentary":"supplementary",
+  "abscence":"absence","absense":"absence",
+  "permision":"permission","permssion":"permission",
+  "prctical":"practical","practcals":"practicals",
+  "studing":"studying","studeing":"studying",
+  "minium":"minimum","minimuim":"minimum",
+  "yr":"year","yrs":"years",
+  "sem":"semester","sem5":"sem5","sem3":"sem3","sem6":"sem6","sem4":"sem4","sem7":"sem7","sem8":"sem8",
+  "cs":"cs","cse":"cse","ece":"ece","eee":"eee","me":"me","ce":"ce","mba":"mba","mca":"mca"
+};
+
+const LEET_MAP={"0":"o","1":"i","3":"e","@":"a","$":"s","!":"i"};
+
+function leeToAlpha(s){return s.replace(/[013@$!]/g,c=>LEET_MAP[c]||c);}
+
+let totalProcessed=0,totalCorrections=0;
+
+function pipeline(raw){
+  const steps={};
+
+  // STEP 1: lowercase
+  const s1=raw.toLowerCase();
+  steps.s1=s1;
+
+  // STEP 2: punctuation & noise removal — keep alphanumeric, spaces, basic domain chars (%, /)
+  // First expand leet: replace digits used as letters in word context
+  const leet=s1.replace(/\b([a-z]*[013@$!][a-z]*)\b/g,w=>leeToAlpha(w));
+  // strip repeated punctuation like ??? !! --> single instance or space
+  const dePunct=leet.replace(/([!?.,;:'"(){}\[\]]+)/g,' ').replace(/\s+/g,' ').trim();
+  steps.s2=dePunct;
+
+  // STEP 3: tokenize on whitespace
+  const tokens=dePunct.split(/\s+/).filter(Boolean);
+  steps.s3=tokens;
+
+  // STEP 4: stop word removal
+  const filtered=tokens.filter(t=>!STOP_WORDS.has(t));
+  const removedStop=tokens.filter(t=>STOP_WORDS.has(t));
+  steps.s4={kept:filtered,removed:removedStop};
+
+  // STEP 5: spelling normalization
+  let corrections=0;
+  const normalized=filtered.map(t=>{
+    const lower=t.toLowerCase();
+    if(SPELL_MAP[lower]&&SPELL_MAP[lower]!==lower){corrections++;return{original:t,fixed:SPELL_MAP[lower],changed:true};}
+    return{original:t,fixed:t,changed:false};
+  });
+  steps.s5={tokens:normalized,corrections};
+
+  const finalTokens=normalized.map(n=>n.fixed);
+  steps.final=finalTokens.join(' ');
+  steps.corrections=corrections;
+
+  return steps;
+}
+
+let stepDelay=0;
+
+async function animateStep(id,renderFn){
+  const card=document.getElementById(id);
+  card.classList.add('active');
+  const body=card.querySelector('.step-body');
+  body.innerHTML='<div class="dot-anim"><div class="dt"></div><div class="dt"></div><div class="dt"></div></div>';
+  await new Promise(r=>setTimeout(r,220));
+  renderFn(body);
+}
+
+function tok(text,cls){return `<span class="tok ${cls}">${text}</span>`;}
+
+async function runPipeline(raw){
+  const steps=pipeline(raw);
+
+  await animateStep('s1',body=>{
+    body.innerHTML=`<div class="step-label">Input</div><div class="step-val" style="color:var(--color-text-tertiary);text-decoration:line-through">${raw}</div><div class="step-label" style="margin-top:6px">Lowercased</div><div class="step-val">${steps.s1}</div>`;
+  });
+
+  await animateStep('s2',body=>{
+    body.innerHTML=`<div class="step-label">After punct/leet removal</div><div class="step-val">${steps.s2}</div><div style="margin-top:5px;font-size:11px;color:var(--color-text-tertiary)">Stripped: ??!.,;:\'"  |  Leet: 0→o, 3→e, !→i</div>`;
+  });
+
+  await animateStep('s3',body=>{
+    body.innerHTML=`<div class="step-label">Tokens (${steps.s3.length})</div><div class="token-row">${steps.s3.map(t=>tok(t,'kept')).join('')}</div>`;
+  });
+
+  await animateStep('s4',body=>{
+    const all=steps.s3.map(t=>STOP_WORDS.has(t)?tok(t,'removed'):tok(t,'kept')).join('');
+    body.innerHTML=`<div class="step-label">Token classification</div><div class="token-row">${all}</div><div style="margin-top:5px;font-size:11px;color:var(--color-text-tertiary)">${steps.s4.removed.length} stop word(s) removed → ${steps.s4.kept.length} kept</div>`;
+  });
+
+  await animateStep('s5',body=>{
+    const toks=steps.s5.tokens.map(n=>n.changed?`<span class="tok spell" title="was: ${n.original}">${n.fixed} <span style="font-size:9px;opacity:.7">← ${n.original}</span></span>`:tok(n.fixed,'kept')).join('');
+    body.innerHTML=`<div class="step-label">Normalized tokens</div><div class="token-row">${toks||'<span style="font-size:11.5px;color:var(--color-text-tertiary)">No tokens remaining</span>'}</div>${steps.s5.corrections?`<div style="margin-top:5px;font-size:11px;color:#534AB7">${steps.s5.corrections} spelling correction(s) applied</div>`:''}`;
+  });
+
+  return steps;
+}
+
+const FAQ_RULES=[
+  {keys:['exam','schedule','date','timetable','when','time'],ans:'Exam schedules are published on the portal 3 weeks before the exam period. Check portal.institute.edu/exams for your semester timetable.'},
+  {keys:['fee','fees','payment','pay','amount','structure'],ans:'Fee details: Tuition ₹42,500 + Dev ₹5,000 + Lab ₹3,000 + Exam ₹1,500 = ₹52,000 per semester. Pay via portal.institute.edu/fees.'},
+  {keys:['attendance','absent','bunk','minimum','percent','percentage'],ans:'Minimum 75% attendance required per subject. Below 65% leads to debarment. Medical/sports condonation available for 65–74%.'},
+  {keys:['hall','ticket','admit','card','hallticket'],ans:'Hall tickets are available on the student portal 7 days before exams. Download from portal.institute.edu → Examination → Hall Ticket.'},
+  {keys:['library','book','borrow','return','issue'],ans:'Library hours: Mon–Sat 8 AM–8 PM, Sun 10 AM–4 PM. During exams: 8 AM–10 PM. Books issued at counter, 9 AM–5 PM.'},
+  {keys:['result','marks','grade','score','gpa','cgpa'],ans:'Results are published within 30 days of exam completion. Check portal.institute.edu/results using your roll number.'},
+  {keys:['hostel','accommodation','room','dormitory'],ans:'Hostel available for boys (450 seats) and girls (350 seats). Monthly charges ₹6,500 incl. mess. Apply by June 30.'},
+  {keys:['placement','job','company','recruit','internship','campus'],ans:'Placement Cell: Room 301, New Block. 2023 avg ₹6.8 LPA, highest ₹24 LPA. 120+ companies expected. Email placement@institute.edu.'},
+  {keys:['syllabus','topics','chapter','curriculum','subject'],ans:'Syllabi are available on the academic portal under each department. Check portal.institute.edu/academics → Your Semester.'},
+  {keys:['revaluation','re-exam','supplementary','backlog','arrear'],ans:'Revaluation forms available 10 days post-result. Fee: ₹500/subject. Supplementary exams held once per year in July.'},
+  {keys:['semester','start','begin','end','academic','calendar'],ans:'Academic Calendar: Odd Sem July 15–Nov 30, Even Sem Jan 6–May 10. Check portal for exact dates and holidays.'},
+  {keys:['principal','director','head'],ans:'Principal: Dr. Ramesh Iyer. Room 201, Main Building. Appointments: Tue & Thu 11 AM–1 PM. Email: principal@institute.edu'},
+  {keys:['contact','phone','email','support','helpdesk','grievance'],ans:'Student Support: Ground Floor, Student Centre. Phone: +91 90000 55555. Email: support@institute.edu. Mon–Sat 9 AM–5 PM.'},
+  {keys:['practical','lab','viva','project'],ans:'Practical exams and vivas are scheduled in the last 2 weeks of each semester. Dates posted on notice boards and the academic portal.'},
+  {keys:['certificate','bonafide','migration','document'],ans:'Certificates (bonafide, migration, etc.) are issued by the admin office. Processing time: 3–5 working days. Apply at Room 102.'},
+];
+
+function matchFaq(tokens){
+  let best=null,bestScore=0;
+  FAQ_RULES.forEach(rule=>{
+    const score=tokens.filter(t=>rule.keys.includes(t)).length;
+    if(score>bestScore){bestScore=score;best=rule;}
+  });
+  return bestScore>0?best:null;
+}
+
+function addMsg(role,html){
+  const c=document.getElementById('msgs');
+  const row=document.createElement('div');row.className='row'+(role==='user'?' user':'');
+  const av=document.createElement('div');av.className='av '+role;av.textContent=role==='bot'?'AI':'U';
+  const bub=document.createElement('div');bub.className='bub '+role;bub.innerHTML=html;
+  row.appendChild(av);row.appendChild(bub);c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  const c=document.getElementById('msgs');const r=document.createElement('div');r.className='row';r.id='typ';
+  const av=document.createElement('div');av.className='av bot';av.textContent='AI';
+  const bub=document.createElement('div');bub.className='bub bot';bub.innerHTML='<div class="dot-anim"><div class="dt"></div><div class="dt"></div><div class="dt"></div></div>';
+  r.appendChild(av);r.appendChild(bub);c.appendChild(r);c.scrollTop=c.scrollHeight;
+}
+function removeTyping(){const e=document.getElementById('typ');if(e)e.remove();}
+
+async function go(preset){
+  const inp=document.getElementById('inp');const btn=document.getElementById('sbtn');
+  const raw=(preset||inp.value).trim();if(!raw)return;
+  inp.value='';btn.disabled=true;
+  addMsg('user',raw);
+
+  // Run pipeline
+  const steps=await runPipeline(raw);
+  totalProcessed++;
+  totalCorrections+=steps.corrections;
+
+  // Update stats
+  document.getElementById('st-total').textContent=totalProcessed;
+  document.getElementById('st-kept').textContent=steps.s5.tokens.length;
+  document.getElementById('st-corr').textContent=totalCorrections;
+
+  // Bot response
+  showTyping();
+  await new Promise(r=>setTimeout(r,400));
+  removeTyping();
+
+  const finalTokens=steps.s5.tokens.map(n=>n.fixed);
+  const faq=matchFaq(finalTokens);
+
+  let botHtml='';
+  if(faq){
+    botHtml=`${faq.ans}<div style="margin-top:6px;padding:5px 8px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:6px;font-size:11px;color:var(--color-text-tertiary);font-family:var(--font-mono)">matched on: [${finalTokens.filter(t=>faq.keys.includes(t)).join(', ')}]</div>`;
+  }else if(finalTokens.length===0){
+    botHtml='Your query seems to contain only stop words or noise. Could you rephrase with your main topic — like "exam", "fees", or "attendance"?';
+  }else{
+    botHtml=`I didn't match a specific FAQ for "<em>${finalTokens.join(' ')}</em>". Try asking about: exam schedule, fee structure, attendance, hall ticket, library, results, hostel, or placement.`;
+  }
+
+  addMsg('bot',botHtml);
+  btn.disabled=false;inp.focus();
+}
+
+document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+
+addMsg('bot','Type a messy student query — typos, slang, punctuation, text-speak — and watch the 5-stage preprocessing pipeline clean it in real time on the right. The cleaned tokens then match FAQs.');
+</script>
